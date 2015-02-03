@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿using System.Threading.Tasks;
+using MediaPicker.Forms.Plugin.Abstractions;
 using Xamarin.Forms;
 
 namespace TestAndSampleApp
@@ -12,19 +9,7 @@ namespace TestAndSampleApp
 		public App()
 		{
 			// The root page of your application
-			MainPage = new ContentPage
-			{
-				Content = new StackLayout
-				{
-					VerticalOptions = LayoutOptions.Center,
-					Children = {
-						new Label {
-							XAlign = TextAlignment.Center,
-							Text = "Welcome to Xamarin Forms!"
-						}
-					}
-				}
-			};
+			MainPage = new MainContentPage();
 		}
 
 		protected override void OnStart()
@@ -40,6 +25,71 @@ namespace TestAndSampleApp
 		protected override void OnResume()
 		{
 			// Handle when your app resumes
+		}
+	}
+
+
+	public class MainContentPage : ContentPage
+	{
+		public MainContentPage()
+		{
+			IMediaPicker media = DependencyService.Get<IMediaPicker>();
+			TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
+			var status = new Label();
+			ImageSource imageSource = new StreamImageSource();
+			var image = new Image()
+			{
+				Source = imageSource,
+				HeightRequest = 100,
+				WidthRequest = 100,
+				Aspect = Aspect.Fill,
+				BackgroundColor = Color.Blue
+			};
+
+			var button = new Button()
+			{
+				Text = "Take a picture",
+				Command = new Command(async _ =>
+				{
+					await media.TakePhotoAsync(new CameraMediaStorageOptions { DefaultCamera = CameraDevice.Front, MaxPixelDimension = 400 }).ContinueWith(t =>
+					{
+						if (t.IsFaulted)
+						{
+							status.Text = t.Exception.InnerException.ToString();
+						}
+						else if (t.IsCanceled)
+						{
+							status.Text = "Canceled";
+						}
+						else
+						{
+							var mediaFile = t.Result;
+							status.Text = "WE GOT A PHOTO!";
+							imageSource = ImageSource.FromStream(() => mediaFile.Source);
+							image.Source = ImageSource.FromStream(() => mediaFile.Source);
+						}
+					}, scheduler);
+				})
+			};
+
+
+
+			Content = new StackLayout
+			{
+				VerticalOptions = LayoutOptions.Center,
+				Children =
+				{
+					new Label
+					{
+						XAlign = TextAlignment.Center,
+						Text = "Welcome to Xamarin Forms!"
+					},
+					button,
+					status,
+					image
+				}
+			};
 		}
 	}
 }
