@@ -3,8 +3,6 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B247CD16-F640-445E-83BA-202D6769156D}</ProjectGuid>
     <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
@@ -95,12 +93,13 @@
     <None Include="Info.plist" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <ITunesArtwork Include="iTunesArtwork" />
-    <ITunesArtwork Include="iTunesArtwork@2x" />
     <None Include="packages.config" />
+    <ITunesArtwork Include="iTunesArtwork%402x" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TestAndSampleApp\TestAndSampleApp.csproj">
       <Name>TestAndSampleApp</Name>
+      <Project>{C41C3FD4-5EBB-4E9D-905B-2D034073E5D2}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -124,7 +123,6 @@
   <ItemGroup>
     <Reference Include="MediaPicker.Forms.Plugin.Abstractions">
       <HintPath>..\..\packages\detroitpro.Forms.Plugin.MediaPicker.0.0.1\lib\Xamarin.iOS10\MediaPicker.Forms.Plugin.Abstractions.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="MediaPicker.Forms.Plugin.iOSUnified">
       <HintPath>..\..\packages\detroitpro.Forms.Plugin.MediaPicker.0.0.1\lib\Xamarin.iOS10\MediaPicker.Forms.Plugin.iOSUnified.dll</HintPath>

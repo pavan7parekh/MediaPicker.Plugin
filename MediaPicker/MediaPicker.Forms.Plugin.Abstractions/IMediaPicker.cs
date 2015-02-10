@@ -13,11 +13,13 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 		/// </summary>
 		/// <value><c>true</c> if this instance is camera available; otherwise, <c>false</c>.</value>
 		bool IsCameraAvailable { get; }
+
 		/// <summary>
 		/// Gets a value indicating whether this instance is photos supported.
 		/// </summary>
 		/// <value><c>true</c> if this instance is photos supported; otherwise, <c>false</c>.</value>
 		bool IsPhotosSupported { get; }
+
 		/// <summary>
 		/// Gets a value indicating whether this instance is videos supported.
 		/// </summary>
@@ -29,28 +31,28 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 		/// </summary>
 		/// <param name="options">The storage options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
-		Task<MediaFile> SelectPhotoAsync(CameraMediaStorageOptions options);
+		Task<MediaFile> SelectPhotoAsync (CameraMediaStorageOptions options);
 
 		/// <summary>
 		/// Takes the picture.
 		/// </summary>
 		/// <param name="options">The storage options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
-		Task<MediaFile> TakePhotoAsync(CameraMediaStorageOptions options);
+		Task<MediaFile> TakePhotoAsync (CameraMediaStorageOptions options);
 
 		/// <summary>
 		/// Selects the video asynchronous.
 		/// </summary>
 		/// <param name="options">The options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
-		Task<MediaFile> SelectVideoAsync(VideoMediaStorageOptions options);
+		Task<MediaFile> SelectVideoAsync (VideoMediaStorageOptions options);
 
 		/// <summary>
 		/// Takes the video asynchronous.
 		/// </summary>
 		/// <param name="options">The options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
-		Task<MediaFile> TakeVideoAsync(VideoMediaStorageOptions options);
+		Task<MediaFile> TakeVideoAsync (VideoMediaStorageOptions options);
 
 		/// <summary>
 		/// Event the fires when media has been selected
@@ -63,6 +65,10 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 		/// </summary>
 		/// <value>The on error.</value>
 		EventHandler<MediaPickerErrorArgs> OnError { get; set; }
+
+
+		byte[] ResizeImage (byte[] imageData, float width, float height);
+
 	}
 
 	/// <summary>
@@ -74,7 +80,7 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 		/// Initializes a new instance of the <see cref="MediaPickerArgs" /> class.
 		/// </summary>
 		/// <param name="mf">The mf.</param>
-		public MediaPickerArgs(MediaFile mf)
+		public MediaPickerArgs (MediaFile mf)
 		{
 			MediaFile = mf;
 		}
@@ -95,7 +101,7 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 		/// Initializes a new instance of the <see cref="MediaPickerErrorArgs" /> class.
 		/// </summary>
 		/// <param name="ex">The ex.</param>
-		public MediaPickerErrorArgs(Exception ex)
+		public MediaPickerErrorArgs (Exception ex)
 		{
 			Error = ex;
 		}

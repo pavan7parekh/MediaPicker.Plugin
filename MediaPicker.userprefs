@@ -1,0 +1,14 @@
+﻿<Properties StartupItem="MediaPicker/MediaPicker.Forms.Plugin.Abstractions/MediaPicker.Forms.Plugin.Abstractions.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MediaPicker/MediaPicker.Forms.Plugin.iOS/MediaPickerImplementation.cs">
+    <Files>
+      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.Android/MediaPickerImplementation.cs" Line="50" Column="50" />
+      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.Abstractions/IMediaPicker.cs" Line="3" Column="3" />
+      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.iOS/MediaPickerImplementation.cs" Line="22" Column="22" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

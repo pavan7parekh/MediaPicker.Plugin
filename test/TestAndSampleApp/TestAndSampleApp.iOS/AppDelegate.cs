@@ -4,6 +4,9 @@ using System.Linq;
 
 using Foundation;
 using UIKit;
+using Xamarin.Forms;
+using MediaPicker.Forms.Plugin.Abstractions;
+using MediaPicker.Forms.Plugin.iOS;
 
 namespace TestAndSampleApp.iOS
 {
@@ -22,6 +25,8 @@ namespace TestAndSampleApp.iOS
 		//
 		public override bool FinishedLaunching(UIApplication app, NSDictionary options)
 		{
+
+			DependencyService.Register<IMediaPicker, MediaPickerImplementation> ();
 			global::Xamarin.Forms.Forms.Init();
 			LoadApplication(new App());
 

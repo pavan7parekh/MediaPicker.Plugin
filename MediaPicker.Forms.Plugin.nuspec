@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>detroitpro.Forms.Plugin.MediaPicker</id>
-       <version>0.0.1</version>
+       <version>0.0.2</version>
        <title>MediaPicker Plugin for Xamarin.Forms</title>
        <authors>Eric Polerecky</authors>
        <owners>Eric Polerecky</owners>
@@ -16,7 +16,6 @@
        <summary>Short description for your plugin.</summary>
        <tags>xamarin, pcl, xam.pcl, plugin, plugin for xamarin.forms, windows phone, winphone, wp8, android, xamarin.forms, ios, media, camera, photos</tags>
        <dependencies>
-         <dependency id="Xamarin.Forms" version="1.3.1.6296" />
        </dependencies>
    </metadata>
    <files>
