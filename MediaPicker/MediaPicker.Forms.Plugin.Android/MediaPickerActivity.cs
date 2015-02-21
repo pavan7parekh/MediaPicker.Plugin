@@ -10,6 +10,7 @@ using Android.Provider;
 using MediaPicker.Forms.Plugin.Abstractions;
 using Environment = Android.OS.Environment;
 using Uri = Android.Net.Uri;
+using Android.Graphics;
 
 namespace MediaPicker.Forms.Plugin.Droid
 {
@@ -51,6 +52,8 @@ namespace MediaPicker.Forms.Plugin.Droid
 		internal const string ExtraTasked = "tasked";
 
 		internal const string ExtraMaxPixelDimension = "maxPixelDimension";
+
+		internal const string ExtraPercentQuality = "percentQuality";
 
 		/// <summary>
 		///     The medi a_ fil e_ extr a_ name
@@ -106,6 +109,10 @@ namespace MediaPicker.Forms.Plugin.Droid
 		///     The type
 		/// </summary>
 		private string _type;
+
+		private int _maxPixelDimension;
+
+		private int _percentQuality;
 
 		/// <summary>
 		///     Occurs when [media picked].
@@ -251,22 +258,22 @@ namespace MediaPicker.Forms.Plugin.Droid
 		///         </format>
 		///     </para>
 		/// </remarks>
-		protected override void OnSaveInstanceState(Bundle outState)
+		protected override void OnSaveInstanceState (Bundle outState)
 		{
-			outState.PutBoolean("ran", true);
-			outState.PutString(MediaStore.MediaColumns.Title, _title);
-			outState.PutString(MediaStore.Images.ImageColumns.Description, _description);
-			outState.PutInt(ExtraId, _id);
-			outState.PutString(ExtraType, _type);
-			outState.PutString(ExtraAction, _action);
-			outState.PutInt(MediaStore.ExtraDurationLimit, _seconds);
-			outState.PutInt(MediaStore.ExtraVideoQuality, (int) _quality);
-			outState.PutBoolean(ExtraTasked, _tasked);
+			outState.PutBoolean ("ran", true);
+			outState.PutString (MediaStore.MediaColumns.Title, _title);
+			outState.PutString (MediaStore.Images.ImageColumns.Description, _description);
+			outState.PutInt (ExtraId, _id);
+			outState.PutString (ExtraType, _type);
+			outState.PutString (ExtraAction, _action);
+			outState.PutInt (MediaStore.ExtraDurationLimit, _seconds);
+			outState.PutInt (MediaStore.ExtraVideoQuality, (int)_quality);
+			outState.PutBoolean (ExtraTasked, _tasked);
 
 			if (_path != null)
-				outState.PutString(ExtraPath, _path.Path);
+				outState.PutString (ExtraPath, _path.Path);
 
-			base.OnSaveInstanceState(outState);
+			base.OnSaveInstanceState (outState);
 		}
 
 		/// <summary>
@@ -349,72 +356,62 @@ namespace MediaPicker.Forms.Plugin.Droid
 		///         </format>
 		///     </para>
 		/// </remarks>
-		protected override void OnCreate(Bundle savedInstanceState)
+		protected override void OnCreate (Bundle savedInstanceState)
 		{
-			base.OnCreate(savedInstanceState);
+			base.OnCreate (savedInstanceState);
 
 			var b = (savedInstanceState ?? Intent.Extras);
 
-			var ran = b.GetBoolean("ran", false);
+			var ran = b.GetBoolean ("ran", false);
 
-			_title = b.GetString(MediaStore.MediaColumns.Title);
-			_description = b.GetString(MediaStore.Images.ImageColumns.Description);
+			_title = b.GetString (MediaStore.MediaColumns.Title);
+			_description = b.GetString (MediaStore.Images.ImageColumns.Description);
 
-			_tasked = b.GetBoolean(ExtraTasked);
-			_id = b.GetInt(ExtraId, 0);
-			_type = b.GetString(ExtraType);
+			_tasked = b.GetBoolean (ExtraTasked);
+			_id = b.GetInt (ExtraId, 0);
+			_type = b.GetString (ExtraType);
+			_maxPixelDimension = b.GetInt (ExtraMaxPixelDimension, 0);
+			_percentQuality = b.GetInt (ExtraPercentQuality, 100);
 
-			if (_type == "image/*")
-			{
+			if (_type == "image/*") {
 				_isPhoto = true;
 			}
 
-			_action = b.GetString(ExtraAction);
+			_action = b.GetString (ExtraAction);
 			Intent pickIntent = null;
 
-			try
-			{
-				pickIntent = new Intent(_action);
+			try {
+				pickIntent = new Intent (_action);
 				if (_action == Intent.ActionPick)
-					pickIntent.SetType(_type);
-				else
-				{
-					if (!_isPhoto)
-					{
-						_seconds = b.GetInt(MediaStore.ExtraDurationLimit, 0);
-						if (_seconds != 0)
-						{
-							pickIntent.PutExtra(MediaStore.ExtraDurationLimit, _seconds);
+					pickIntent.SetType (_type);
+				else {
+					if (!_isPhoto) {
+						_seconds = b.GetInt (MediaStore.ExtraDurationLimit, 0);
+						if (_seconds != 0) {
+							pickIntent.PutExtra (MediaStore.ExtraDurationLimit, _seconds);
 						}
 					}
 
-					_quality = (VideoQuality) b.GetInt(MediaStore.ExtraVideoQuality, (int) VideoQuality.High);
-					pickIntent.PutExtra(MediaStore.ExtraVideoQuality, GetVideoQuality(_quality));
+					_quality = (VideoQuality)b.GetInt (MediaStore.ExtraVideoQuality, (int)VideoQuality.High);
+					pickIntent.PutExtra (MediaStore.ExtraVideoQuality, GetVideoQuality (_quality));
 
-					if (!ran)
-					{
-						_path = GetOutputMediaFile(this, b.GetString(ExtraPath), _title, _isPhoto);
+					if (!ran) {
+						_path = GetOutputMediaFile (this, b.GetString (ExtraPath), _title, _isPhoto);
 
-						Touch();
-						pickIntent.PutExtra(MediaStore.ExtraOutput, _path);
-					}
-					else
-						_path = Uri.Parse(b.GetString(ExtraPath));
+						Touch ();
+						pickIntent.PutExtra (MediaStore.ExtraOutput, _path);
+					} else
+						_path = Uri.Parse (b.GetString (ExtraPath));
 				}
 
-				if (!ran)
-				{
-					StartActivityForResult(pickIntent, _id);
+				if (!ran) {
+					StartActivityForResult (pickIntent, _id);
 				}
-			}
-			catch (Exception ex)
-			{
-				RaiseOnMediaPicked(new MediaPickedEventArgs(_id, ex));
-			}
-			finally
-			{
+			} catch (Exception ex) {
+				RaiseOnMediaPicked (new MediaPickedEventArgs (_id, ex));
+			} finally {
 				if (pickIntent != null)
-					pickIntent.Dispose();
+					pickIntent.Dispose ();
 			}
 		}
 
@@ -470,38 +467,32 @@ namespace MediaPicker.Forms.Plugin.Droid
 		///         </format>
 		///     </para>
 		/// </remarks>
-		protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
+		protected override void OnActivityResult (int requestCode, Result resultCode, Intent data)
 		{
-			base.OnActivityResult(requestCode, resultCode, data);
+			base.OnActivityResult (requestCode, resultCode, data);
 
-			if (_tasked)
-			{
+			if (_tasked) {
 				var future = resultCode == Result.Canceled
-					? TaskUtils.TaskFromResult(new MediaPickedEventArgs(requestCode, true))
-					: GetMediaFileAsync(this, requestCode, _action, _isPhoto, ref _path, (data != null) ? data.Data : null);
+					? TaskUtils.TaskFromResult (new MediaPickedEventArgs (requestCode, true))
+					: GetMediaFileAsync (this, requestCode, _action, _isPhoto, ref _path, (data != null) ? data.Data : null, _maxPixelDimension, _percentQuality);
 
-				Finish();
+				Finish ();
 
-				future.ContinueWith(t => RaiseOnMediaPicked(t.Result));
-			}
-			else
-			{
-				if (resultCode == Result.Canceled)
-				{
-					SetResult(Result.Canceled);
-				}
-				else
-				{
-					var resultData = new Intent();
-					resultData.PutExtra(MediaFileExtraName, (data != null) ? data.Data : null);
-					resultData.PutExtra(ExtraPath, _path);
-					resultData.PutExtra("isPhoto", _isPhoto);
-					resultData.PutExtra(ExtraAction, _action);
+				future.ContinueWith (t => RaiseOnMediaPicked (t.Result));
+			} else {
+				if (resultCode == Result.Canceled) {
+					SetResult (Result.Canceled);
+				} else {
+					var resultData = new Intent ();
+					resultData.PutExtra (MediaFileExtraName, (data != null) ? data.Data : null);
+					resultData.PutExtra (ExtraPath, _path);
+					resultData.PutExtra ("isPhoto", _isPhoto);
+					resultData.PutExtra (ExtraAction, _action);
 
-					SetResult(Result.Ok, resultData);
+					SetResult (Result.Ok, resultData);
 				}
 
-				Finish();
+				Finish ();
 			}
 		}
 
@@ -515,57 +506,95 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// <param name="path">The path.</param>
 		/// <param name="data">The data.</param>
 		/// <returns>Task&lt;MediaPickedEventArgs&gt;.</returns>
-		internal static Task<MediaPickedEventArgs> GetMediaFileAsync(Context context, int requestCode, string action,
-			bool isPhoto, ref Uri path, Uri data)
+		internal static Task<MediaPickedEventArgs> GetMediaFileAsync (Context context, int requestCode, string action,
+		                                                              bool isPhoto, ref Uri path, Uri data, int maxPixelDimension, int percentQuality)
 		{
 			Task<Tuple<string, bool>> pathFuture;
 			Action<bool> dispose = null;
 			string originalPath = null;
 
-			if (action != Intent.ActionPick)
-			{
+			if (action != Intent.ActionPick) {
 				originalPath = path.Path;
 
 				// Not all camera apps respect EXTRA_OUTPUT, some will instead
 				// return a content or file uri from data.
-				if (data != null && data.Path != originalPath)
-				{
-					originalPath = data.ToString();
+				if (data != null && data.Path != originalPath) {
+					originalPath = data.ToString ();
 					var currentPath = path.Path;
 
-					pathFuture = TryMoveFileAsync(context, data, path, isPhoto).ContinueWith(t =>
-						new Tuple<string, bool>(t.Result ? currentPath : null, false));
-				}
-				else
-					pathFuture = TaskUtils.TaskFromResult(new Tuple<string, bool>(path.Path, false));
-			}
-			else if (data != null)
-			{
-				originalPath = data.ToString();
+					pathFuture = TryMoveFileAsync (context, data, path, isPhoto).ContinueWith (t =>
+						new Tuple<string, bool> (t.Result ? currentPath : null, false));
+				} else
+					pathFuture = TaskUtils.TaskFromResult (new Tuple<string, bool> (path.Path, false));
+			} else if (data != null) {
+				originalPath = data.ToString ();
 				path = data;
-				pathFuture = GetFileForUriAsync(context, path, isPhoto);
-			}
-			else
-			{
-				pathFuture = TaskUtils.TaskFromResult<Tuple<string, bool>>(null);
+				pathFuture = GetFileForUriAsync (context, path, isPhoto);
+			} else {
+				pathFuture = TaskUtils.TaskFromResult<Tuple<string, bool>> (null);
 			}
 
-			return pathFuture.ContinueWith(t =>
-			{
+			return pathFuture.ContinueWith (t => {
 				var resultPath = t.Result.Item1;
-				if (resultPath != null && File.Exists(t.Result.Item1))
-				{
-					if (t.Result.Item2)
-					{
-						dispose = d => File.Delete(resultPath);
+				if (resultPath != null && File.Exists (t.Result.Item1)) {
+					if (t.Result.Item2) {
+						dispose = d => File.Delete (resultPath);
 					}
 
-					var mf = new MediaFile(resultPath, () => File.OpenRead(t.Result.Item1), dispose);
 
-					return new MediaPickedEventArgs(requestCode, false, mf);
+					//TODO: if file exists, check if we need to resize it.s
+					var mf = new MediaFile (resultPath, () => GetStream (t.Result.Item1, isPhoto, maxPixelDimension, percentQuality), dispose);
+
+					return new MediaPickedEventArgs (requestCode, false, mf);
 				}
-				return new MediaPickedEventArgs(requestCode, new MediaFileNotFoundException(originalPath));
+				return new MediaPickedEventArgs (requestCode, new MediaFileNotFoundException (originalPath));
 			});
+		}
+
+
+		/// <summary>
+		/// Reads file from disk, resizes if requested, returns stream.
+		/// </summary>
+		/// <returns>The stream.</returns>
+		/// <param name="path">Path.</param>
+		/// <param name="isPhoto">If set to <c>true</c> is photo.</param>
+		/// <param name="maxPixelDimension">Max pixel dimension.</param>
+		public static Stream GetStream (string path, bool isPhoto, int maxPixelDimension, int percentQuality)
+		{
+			//resize or compress image.
+			if (isPhoto && maxPixelDimension > 0 || percentQuality != 100) {
+				Bitmap image = BitmapFactory.DecodeStream (File.OpenRead (path));
+
+				//resize requested
+				if (maxPixelDimension > 0) {
+
+					int targetWidth = 0;
+					int targetHeight = 0;
+
+					//find max height or width based on pixel dimension
+					ResizeBasedOnPixelDimension (
+						maxPixelDimension,
+						image.Width,
+						image.Height,
+						out targetWidth,
+						out targetHeight);
+					Console.WriteLine ("targetHeight: {0} targetWidth: {1}", targetHeight, targetWidth);
+					image = Bitmap.CreateScaledBitmap (image, (int)targetWidth, (int)targetHeight, false);
+				}
+
+				return MakeStreamFromBitmap (image, percentQuality);
+			} else {
+				//return raw image.
+				return File.OpenRead (path);
+			}
+		}
+
+		private static Stream MakeStreamFromBitmap (Bitmap input, int percentQuality)
+		{
+			MemoryStream memoryStream = new MemoryStream ();
+			input.Compress (Bitmap.CompressFormat.Jpeg, percentQuality, memoryStream);
+			memoryStream.Seek (0L, SeekOrigin.Begin);
+			return memoryStream;
 		}
 
 		/// <summary>
@@ -576,19 +605,18 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// <param name="path">The path.</param>
 		/// <param name="isPhoto">if set to <c>true</c> [is photo].</param>
 		/// <returns>Task&lt;System.Boolean&gt;.</returns>
-		private static Task<bool> TryMoveFileAsync(Context context, Uri url, Uri path, bool isPhoto)
+		private static Task<bool> TryMoveFileAsync (Context context, Uri url, Uri path, bool isPhoto)
 		{
-			var moveTo = GetLocalPath(path);
-			return GetFileForUriAsync(context, url, isPhoto).ContinueWith(t =>
-			{
+			var moveTo = GetLocalPath (path);
+			return GetFileForUriAsync (context, url, isPhoto).ContinueWith (t => {
 				if (t.Result.Item1 == null)
 					return false;
 
-				File.Delete(moveTo);
-				File.Move(t.Result.Item1, moveTo);
+				File.Delete (moveTo);
+				File.Move (t.Result.Item1, moveTo);
 
 				if (url.Scheme == "content")
-					context.ContentResolver.Delete(url, null, null);
+					context.ContentResolver.Delete (url, null, null);
 
 				return true;
 			}, TaskScheduler.Default);
@@ -599,16 +627,15 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// </summary>
 		/// <param name="videoQuality">The video quality.</param>
 		/// <returns>System.Int32.</returns>
-		private static int GetVideoQuality(VideoQuality videoQuality)
+		private static int GetVideoQuality (VideoQuality videoQuality)
 		{
-			switch (videoQuality)
-			{
-				case VideoQuality.Medium:
-				case VideoQuality.High:
-					return 1;
+			switch (videoQuality) {
+			case VideoQuality.Medium:
+			case VideoQuality.High:
+				return 1;
 
-				default:
-					return 0;
+			default:
+				return 0;
 			}
 		}
 
@@ -624,31 +651,28 @@ namespace MediaPicker.Forms.Plugin.Droid
 		///     Couldn't create directory, have you added the WRITE_EXTERNAL_STORAGE
 		///     permission?
 		/// </exception>
-		private static Uri GetOutputMediaFile(Context context, string subdir, string name, bool isPhoto)
+		private static Uri GetOutputMediaFile (Context context, string subdir, string name, bool isPhoto)
 		{
 			subdir = subdir ?? String.Empty;
 
-			if (String.IsNullOrWhiteSpace(name))
-			{
-				name = MediaFileHelpers.GetMediaFileWithPath(isPhoto, subdir, string.Empty, name);
+			if (String.IsNullOrWhiteSpace (name)) {
+				name = MediaFileHelpers.GetMediaFileWithPath (isPhoto, subdir, string.Empty, name);
 			}
 
 			var mediaType = (isPhoto) ? Environment.DirectoryPictures : Environment.DirectoryMovies;
-			using (var mediaStorageDir = new Java.IO.File(context.GetExternalFilesDir(mediaType), subdir))
-			{
-				if (!mediaStorageDir.Exists())
-				{
-					if (!mediaStorageDir.Mkdirs())
-						throw new IOException("Couldn't create directory, have you added the WRITE_EXTERNAL_STORAGE permission?");
+			using (var mediaStorageDir = new Java.IO.File (context.GetExternalFilesDir (mediaType), subdir)) {
+				if (!mediaStorageDir.Exists ()) {
+					if (!mediaStorageDir.Mkdirs ())
+						throw new IOException ("Couldn't create directory, have you added the WRITE_EXTERNAL_STORAGE permission?");
 
 					// Ensure this media doesn't show up in gallery apps
-					using (var nomedia = new Java.IO.File(mediaStorageDir, ".nomedia"))
-						nomedia.CreateNewFile();
+					using (var nomedia = new Java.IO.File (mediaStorageDir, ".nomedia"))
+						nomedia.CreateNewFile ();
 				}
 
 				return
-					Uri.FromFile(
-						new Java.IO.File(MediaFileHelpers.GetUniqueMediaFileWithPath(isPhoto, mediaStorageDir.Path, name, File.Exists)));
+					Uri.FromFile (
+					new Java.IO.File (MediaFileHelpers.GetUniqueMediaFileWithPath (isPhoto, mediaStorageDir.Path, name, File.Exists)));
 			}
 		}
 
@@ -659,29 +683,25 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// <param name="uri">The URI.</param>
 		/// <param name="isPhoto">if set to <c>true</c> [is photo].</param>
 		/// <returns>Task&lt;Tuple&lt;System.String, System.Boolean&gt;&gt;.</returns>
-		internal static Task<Tuple<string, bool>> GetFileForUriAsync(Context context, Uri uri, bool isPhoto)
+		internal static Task<Tuple<string, bool>> GetFileForUriAsync (Context context, Uri uri, bool isPhoto)
 		{
-			var tcs = new TaskCompletionSource<Tuple<string, bool>>();
+			var tcs = new TaskCompletionSource<Tuple<string, bool>> ();
 
 			if (uri.Scheme == "file")
-				tcs.SetResult(new Tuple<string, bool>(new System.Uri(uri.ToString()).LocalPath, false));
-			else if (uri.Scheme == "content")
-			{
-				Task.Factory.StartNew(() =>
-				{
+				tcs.SetResult (new Tuple<string, bool> (new System.Uri (uri.ToString ()).LocalPath, false));
+			else if (uri.Scheme == "content") {
+				Task.Factory.StartNew (() => {
 					ICursor cursor = null;
-					try
-					{
-						cursor = context.ContentResolver.Query(uri, null, null, null, null);
-						if (cursor == null || !cursor.MoveToNext())
-							tcs.SetResult(new Tuple<string, bool>(null, false));
-						else
-						{
-							var column = cursor.GetColumnIndex(MediaStore.MediaColumns.Data);
+					try {
+						cursor = context.ContentResolver.Query (uri, null, null, null, null);
+						if (cursor == null || !cursor.MoveToNext ())
+							tcs.SetResult (new Tuple<string, bool> (null, false));
+						else {
+							var column = cursor.GetColumnIndex (MediaStore.MediaColumns.Data);
 							string contentPath = null;
 
 							if (column != -1)
-								contentPath = cursor.GetString(column);
+								contentPath = cursor.GetString (column);
 
 							var copied = false;
 
@@ -707,21 +727,17 @@ namespace MediaPicker.Forms.Plugin.Droid
 							//								}
 							//							}
 
-							tcs.SetResult(new Tuple<string, bool>(contentPath, copied));
+							tcs.SetResult (new Tuple<string, bool> (contentPath, copied));
 						}
-					}
-					finally
-					{
-						if (cursor != null)
-						{
-							cursor.Close();
-							cursor.Dispose();
+					} finally {
+						if (cursor != null) {
+							cursor.Close ();
+							cursor.Dispose ();
 						}
 					}
 				}, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
-			}
-			else
-				tcs.SetResult(new Tuple<string, bool>(null, false));
+			} else
+				tcs.SetResult (new Tuple<string, bool> (null, false));
 
 			return tcs.Task;
 		}
@@ -731,33 +747,65 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// </summary>
 		/// <param name="uri">The URI.</param>
 		/// <returns>System.String.</returns>
-		private static string GetLocalPath(Uri uri)
+		private static string GetLocalPath (Uri uri)
 		{
-			return new System.Uri(uri.ToString()).LocalPath;
+			return new System.Uri (uri.ToString ()).LocalPath;
 		}
 
 		/// <summary>
 		///     Touches this instance.
 		/// </summary>
-		private void Touch()
+		private void Touch ()
 		{
 			if (_path.Scheme != "file")
 				return;
 
-			File.Create(GetLocalPath(_path)).Close();
+			File.Create (GetLocalPath (_path)).Close ();
 		}
 
 		/// <summary>
 		///     Handles the <see cref="E:MediaPicked" /> event.
 		/// </summary>
 		/// <param name="e">The <see cref="MediaPickedEventArgs" /> instance containing the event data.</param>
-		private static void RaiseOnMediaPicked(MediaPickedEventArgs e)
+		private static void RaiseOnMediaPicked (MediaPickedEventArgs e)
 		{
 			var picked = MediaPicked;
-			if (picked != null)
-			{
-				picked(null, e);
+			if (picked != null) {
+				picked (null, e);
 			}
+		}
+
+
+		/// <summary>
+		/// Calcualtes the target height and width of the image based on the max pixel dimension.
+		/// </summary>
+		/// <param name="maxPixelDimension">The maximum pixel dimension ratio (used to resize the image).</param>
+		/// <param name="currentWidth">Current Width of the image.</param>
+		/// <param name="currentHeight">Current Height of the image.</param>
+		/// <param name="targetWidth">Target Width of the image.</param>
+		/// <param name="targetHeight">Target Height of the image.</param>
+		public static void ResizeBasedOnPixelDimension (
+			int? maxPixelDimension,
+			int currentWidth,
+			int currentHeight,
+			out int targetWidth,
+			out int targetHeight)
+		{
+			if (!maxPixelDimension.HasValue) {
+				targetWidth = currentWidth;
+				targetHeight = currentHeight;
+				return;
+			}
+
+			double ratio;
+			if (currentWidth > currentHeight) {
+				ratio = (maxPixelDimension.Value) / ((double)currentWidth);
+			} else {
+				ratio = (maxPixelDimension.Value) / ((double)currentHeight);
+			}
+
+			targetWidth = (int)Math.Round (ratio * currentWidth);
+			targetHeight = (int)Math.Round (ratio * currentHeight);
 		}
 	}
 }

@@ -19,7 +19,7 @@ using System.Drawing;
 #endif
 
 
-[assembly: Dependency(typeof(MediaPickerImplementation))]
+[assembly: Dependency (typeof(MediaPickerImplementation))]
 namespace MediaPicker.Forms.Plugin.iOS
 {
 	/// <summary>
@@ -30,11 +30,11 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <summary>
 		/// Used for registration with dependency service
 		/// </summary>
-		public static void Init()
+		public static void Init ()
 		{
 		}
 
-#if __UNIFIED__
+		#if __UNIFIED__
 		
 		public Stream ResizeImage(Stream imageData, float width, float height)
 		{
@@ -126,49 +126,44 @@ namespace MediaPicker.Forms.Plugin.iOS
 
 #endif
 
-#if !__UNIFIED__
+		#if !__UNIFIED__
 
 
-		public byte[] ResizeImage(byte[] imageData, float width, float height)
+		public byte[] ResizeImage (byte[] imageData, float width, float height)
 		{
-			UIImage originalImage = ImageFromByteArray(imageData);
+			UIImage originalImage = ImageFromByteArray (imageData);
 
 
 			//create a 24bit RGB image
-			using (CGBitmapContext context = new CGBitmapContext(IntPtr.Zero,
-												 (int)width, (int)height, 8,
-												 (int)(4 * width), CGColorSpace.CreateDeviceRGB(),
-												 CGImageAlphaInfo.PremultipliedFirst))
-			{
+			using (CGBitmapContext context = new CGBitmapContext (IntPtr.Zero,
+				                                 (int)width, (int)height, 8,
+				                                 (int)(4 * width), CGColorSpace.CreateDeviceRGB (),
+				                                 CGImageAlphaInfo.PremultipliedFirst)) {
 
-				RectangleF imageRect = new RectangleF(0, 0, width, height);
+				RectangleF imageRect = new RectangleF (0, 0, width, height);
 
 				// draw the image
-				context.DrawImage(imageRect, originalImage.CGImage);
+				context.DrawImage (imageRect, originalImage.CGImage);
 
-				MonoTouch.UIKit.UIImage resizedImage = MonoTouch.UIKit.UIImage.FromImage(context.ToImage());
+				MonoTouch.UIKit.UIImage resizedImage = MonoTouch.UIKit.UIImage.FromImage (context.ToImage ());
 
 				// save the image as a jpeg
-				return resizedImage.AsJPEG().ToArray();
+				return resizedImage.AsJPEG ().ToArray ();
 			}
 
 		}
 
-		private static MonoTouch.UIKit.UIImage ImageFromByteArray(byte[] data)
+		private static MonoTouch.UIKit.UIImage ImageFromByteArray (byte[] data)
 		{
-			if (data == null)
-			{
+			if (data == null) {
 				return null;
 			}
 
 			MonoTouch.UIKit.UIImage image;
-			try
-			{
-				image = new MonoTouch.UIKit.UIImage(MonoTouch.Foundation.NSData.FromArray(data));
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("Image load failed: " + e.Message);
+			try {
+				image = new MonoTouch.UIKit.UIImage (MonoTouch.Foundation.NSData.FromArray (data));
+			} catch (Exception e) {
+				Console.WriteLine ("Image load failed: " + e.Message);
 				return null;
 			}
 			return image;
@@ -176,52 +171,47 @@ namespace MediaPicker.Forms.Plugin.iOS
 
 
 
-		public Stream ResizeImage(Stream imageData, float width, float height)
+		public Stream ResizeImage (Stream imageData, float width, float height)
 		{
-			UIImage originalImage = ImageFromStream(imageData);
+			UIImage originalImage = ImageFromStream (imageData);
 
 
 			//create a 24bit RGB image
-			using (CGBitmapContext context = new CGBitmapContext(IntPtr.Zero,
-												 (int)width, (int)height, 8,
-												 (int)(4 * width), CGColorSpace.CreateDeviceRGB(),
-												 CGImageAlphaInfo.PremultipliedFirst))
-			{
+			using (CGBitmapContext context = new CGBitmapContext (IntPtr.Zero,
+				                                 (int)width, (int)height, 8,
+				                                 (int)(4 * width), CGColorSpace.CreateDeviceRGB (),
+				                                 CGImageAlphaInfo.PremultipliedFirst)) {
 
-				RectangleF imageRect = new RectangleF(0, 0, width, height);
+				RectangleF imageRect = new RectangleF (0, 0, width, height);
 
 				// draw the image
-				context.DrawImage(imageRect, originalImage.CGImage);
+				context.DrawImage (imageRect, originalImage.CGImage);
 
-				MonoTouch.UIKit.UIImage resizedImage = MonoTouch.UIKit.UIImage.FromImage(context.ToImage());
+				MonoTouch.UIKit.UIImage resizedImage = MonoTouch.UIKit.UIImage.FromImage (context.ToImage ());
 
 				// save the image as a jpeg
-				return resizedImage.AsJPEG().AsStream();
+				return resizedImage.AsJPEG ().AsStream ();
 			}
 
 		}
 
-		private static MonoTouch.UIKit.UIImage ImageFromStream(Stream data)
+		private static MonoTouch.UIKit.UIImage ImageFromStream (Stream data)
 		{
-			if (data == null)
-			{
+			if (data == null) {
 				return null;
 			}
 
 			MonoTouch.UIKit.UIImage image;
-			try
-			{
-				image = new MonoTouch.UIKit.UIImage(MonoTouch.Foundation.NSData.FromStream(data));
-			}
-			catch (Exception e)
-			{
-				Console.WriteLine("Image load failed: " + e.Message);
+			try {
+				image = new MonoTouch.UIKit.UIImage (MonoTouch.Foundation.NSData.FromStream (data));
+			} catch (Exception e) {
+				Console.WriteLine ("Image load failed: " + e.Message);
 				return null;
 			}
 			return image;
 		}
 	
-#endif
+		#endif
 
 
 		/// <summary>
@@ -247,23 +237,19 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MediaPicker"/> class.
 		/// </summary>
-		public MediaPickerImplementation()
+		public MediaPickerImplementation ()
 		{
-			IsCameraAvailable = UIImagePickerController.IsSourceTypeAvailable(UIImagePickerControllerSourceType.Camera);
+			IsCameraAvailable = UIImagePickerController.IsSourceTypeAvailable (UIImagePickerControllerSourceType.Camera);
 
-			var availableCameraMedia = UIImagePickerController.AvailableMediaTypes(UIImagePickerControllerSourceType.Camera)
-									   ?? new string[0];
+			var availableCameraMedia = UIImagePickerController.AvailableMediaTypes (UIImagePickerControllerSourceType.Camera)
+			                           ?? new string[0];
 			var availableLibraryMedia =
-				UIImagePickerController.AvailableMediaTypes(UIImagePickerControllerSourceType.PhotoLibrary) ?? new string[0];
+				UIImagePickerController.AvailableMediaTypes (UIImagePickerControllerSourceType.PhotoLibrary) ?? new string[0];
 
-			foreach (var type in availableCameraMedia.Concat(availableLibraryMedia))
-			{
-				if (type == TypeMovie)
-				{
+			foreach (var type in availableCameraMedia.Concat(availableLibraryMedia)) {
+				if (type == TypeMovie) {
 					IsVideosSupported = true;
-				}
-				else if (type == TypeImage)
-				{
+				} else if (type == TypeImage) {
 					IsPhotosSupported = true;
 				}
 			}
@@ -305,14 +291,13 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <param name="options">The storage options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
 		/// <exception cref="NotSupportedException"></exception>
-		public Task<MediaFile> SelectPhotoAsync(CameraMediaStorageOptions options)
+		public Task<MediaFile> SelectPhotoAsync (CameraMediaStorageOptions options)
 		{
-			if (!IsPhotosSupported)
-			{
-				throw new NotSupportedException();
+			if (!IsPhotosSupported) {
+				throw new NotSupportedException ();
 			}
 
-			return GetMediaAsync(UIImagePickerControllerSourceType.PhotoLibrary, TypeImage);
+			return GetMediaAsync (UIImagePickerControllerSourceType.PhotoLibrary, TypeImage);
 		}
 
 		/// <summary>
@@ -322,20 +307,18 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
 		/// <exception cref="NotSupportedException">
 		/// </exception>
-		public Task<MediaFile> TakePhotoAsync(CameraMediaStorageOptions options)
+		public Task<MediaFile> TakePhotoAsync (CameraMediaStorageOptions options)
 		{
-			if (!IsPhotosSupported)
-			{
-				throw new NotSupportedException();
+			if (!IsPhotosSupported) {
+				throw new NotSupportedException ();
 			}
-			if (!IsCameraAvailable)
-			{
-				throw new NotSupportedException();
+			if (!IsCameraAvailable) {
+				throw new NotSupportedException ("Camera is not available. Are you running in an emulator?");
 			}
 
-			VerifyCameraOptions(options);
+			VerifyCameraOptions (options);
 
-			return GetMediaAsync(UIImagePickerControllerSourceType.Camera, TypeImage, options);
+			return GetMediaAsync (UIImagePickerControllerSourceType.Camera, TypeImage, options);
 		}
 
 		/// <summary>
@@ -344,14 +327,13 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <param name="options">The options.</param>
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
 		/// <exception cref="NotSupportedException"></exception>
-		public Task<MediaFile> SelectVideoAsync(VideoMediaStorageOptions options)
+		public Task<MediaFile> SelectVideoAsync (VideoMediaStorageOptions options)
 		{
-			if (!IsPhotosSupported)
-			{
-				throw new NotSupportedException();
+			if (!IsPhotosSupported) {
+				throw new NotSupportedException ();
 			}
 
-			return GetMediaAsync(UIImagePickerControllerSourceType.PhotoLibrary, TypeMovie);
+			return GetMediaAsync (UIImagePickerControllerSourceType.PhotoLibrary, TypeMovie);
 		}
 
 		/// <summary>
@@ -361,20 +343,18 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <returns>Task&lt;IMediaFile&gt;.</returns>
 		/// <exception cref="NotSupportedException">
 		/// </exception>
-		public Task<MediaFile> TakeVideoAsync(VideoMediaStorageOptions options)
+		public Task<MediaFile> TakeVideoAsync (VideoMediaStorageOptions options)
 		{
-			if (!IsVideosSupported)
-			{
-				throw new NotSupportedException();
+			if (!IsVideosSupported) {
+				throw new NotSupportedException ();
 			}
-			if (!IsCameraAvailable)
-			{
-				throw new NotSupportedException();
+			if (!IsCameraAvailable) {
+				throw new NotSupportedException ();
 			}
 
 			//VerifyCameraOptions (options);
 
-			return GetMediaAsync(UIImagePickerControllerSourceType.Camera, TypeMovie, options);
+			return GetMediaAsync (UIImagePickerControllerSourceType.Camera, TypeMovie, options);
 		}
 
 		/// <summary>
@@ -391,15 +371,14 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// or
 		/// Only one operation can be active at at time
 		/// </exception>
-		private Task<MediaFile> GetMediaAsync(
+		private Task<MediaFile> GetMediaAsync (
 			UIImagePickerControllerSourceType sourceType,
 			string mediaType,
 			MediaStorageOptions options = null)
 		{
 			var window = UIApplication.SharedApplication.KeyWindow;
-			if (window == null)
-			{
-				throw new InvalidOperationException("There's no current active window");
+			if (window == null) {
+				throw new InvalidOperationException ("There's no current active window");
 			}
 
 			var viewController = window.RootViewController;
@@ -419,46 +398,38 @@ namespace MediaPicker.Forms.Plugin.iOS
 				viewController = window.RootViewController;
 			}
 #endif
-			while (viewController.PresentedViewController != null)
-			{
+			while (viewController.PresentedViewController != null) {
 				viewController = viewController.PresentedViewController;
 			}
 
-			var ndelegate = new MediaPickerDelegate(viewController, sourceType, options);
-			var od = Interlocked.CompareExchange(ref _pickerDelegate, ndelegate, null);
-			if (od != null)
-			{
-				throw new InvalidOperationException("Only one operation can be active at at time");
+			var ndelegate = new MediaPickerDelegate (viewController, sourceType, options);
+			var od = Interlocked.CompareExchange (ref _pickerDelegate, ndelegate, null);
+			if (od != null) {
+				throw new InvalidOperationException ("Only one operation can be active at at time");
 			}
 
-			var picker = SetupController(ndelegate, sourceType, mediaType, options);
+			var picker = SetupController (ndelegate, sourceType, mediaType, options);
 
 			if (UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad
-				&& sourceType == UIImagePickerControllerSourceType.PhotoLibrary)
-			{
-				ndelegate.Popover = new UIPopoverController(picker)
-				{
-					Delegate = new MediaPickerPopoverDelegate(ndelegate, picker)
+			    && sourceType == UIImagePickerControllerSourceType.PhotoLibrary) {
+				ndelegate.Popover = new UIPopoverController (picker) {
+					Delegate = new MediaPickerPopoverDelegate (ndelegate, picker)
 				};
-				ndelegate.DisplayPopover();
-			}
-			else
-			{
-				viewController.PresentViewController(picker, true, null);
+				ndelegate.DisplayPopover ();
+			} else {
+				viewController.PresentViewController (picker, true, null);
 			}
 
-			return ndelegate.Task.ContinueWith(
-				t =>
-				{
-					if (_popover != null)
-					{
-						_popover.Dispose();
+			return ndelegate.Task.ContinueWith (
+				t => {
+					if (_popover != null) {
+						_popover.Dispose ();
 						_popover = null;
 					}
 
-					Interlocked.Exchange(ref _pickerDelegate, null);
+					Interlocked.Exchange (ref _pickerDelegate, null);
 					return t;
-				}).Unwrap();
+				}).Unwrap ();
 		}
 
 		/// <summary>
@@ -469,28 +440,24 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <param name="mediaType">Type of the media.</param>
 		/// <param name="options">The options.</param>
 		/// <returns>MediaPickerController.</returns>
-		private static MediaPickerController SetupController(
+		private static MediaPickerController SetupController (
 			MediaPickerDelegate mpDelegate,
 			UIImagePickerControllerSourceType sourceType,
 			string mediaType,
 			MediaStorageOptions options = null)
 		{
-			var picker = new MediaPickerController(mpDelegate) { MediaTypes = new[] { mediaType }, SourceType = sourceType };
+			var picker = new MediaPickerController (mpDelegate) { MediaTypes = new[] { mediaType }, SourceType = sourceType };
 
-			if (sourceType == UIImagePickerControllerSourceType.Camera)
-			{
-				if (mediaType == TypeImage && options is CameraMediaStorageOptions)
-				{
-					picker.CameraDevice = GetCameraDevice(((CameraMediaStorageOptions)options).DefaultCamera);
+			if (sourceType == UIImagePickerControllerSourceType.Camera) {
+				if (mediaType == TypeImage && options is CameraMediaStorageOptions) {
+					picker.CameraDevice = GetCameraDevice (((CameraMediaStorageOptions)options).DefaultCamera);
 					picker.CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Photo;
-				}
-				else if (mediaType == TypeMovie && options is VideoMediaStorageOptions)
-				{
+				} else if (mediaType == TypeMovie && options is VideoMediaStorageOptions) {
 					var voptions = (VideoMediaStorageOptions)options;
 
-					picker.CameraDevice = GetCameraDevice(voptions.DefaultCamera);
+					picker.CameraDevice = GetCameraDevice (voptions.DefaultCamera);
 					picker.CameraCaptureMode = UIImagePickerControllerCameraCaptureMode.Video;
-					picker.VideoQuality = GetQuailty(voptions.Quality);
+					picker.VideoQuality = GetQuailty (voptions.Quality);
 					picker.VideoMaximumDuration = voptions.DesiredLength.TotalSeconds;
 				}
 			}
@@ -504,16 +471,15 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <param name="device">The device.</param>
 		/// <returns>UIImagePickerControllerCameraDevice.</returns>
 		/// <exception cref="NotSupportedException"></exception>
-		private static UIImagePickerControllerCameraDevice GetCameraDevice(CameraDevice device)
+		private static UIImagePickerControllerCameraDevice GetCameraDevice (CameraDevice device)
 		{
-			switch (device)
-			{
-				case CameraDevice.Front:
-					return UIImagePickerControllerCameraDevice.Front;
-				case CameraDevice.Rear:
-					return UIImagePickerControllerCameraDevice.Rear;
-				default:
-					throw new NotSupportedException();
+			switch (device) {
+			case CameraDevice.Front:
+				return UIImagePickerControllerCameraDevice.Front;
+			case CameraDevice.Rear:
+				return UIImagePickerControllerCameraDevice.Rear;
+			default:
+				throw new NotSupportedException ();
 			}
 		}
 
@@ -522,16 +488,15 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// </summary>
 		/// <param name="quality">The quality.</param>
 		/// <returns>UIImagePickerControllerQualityType.</returns>
-		private static UIImagePickerControllerQualityType GetQuailty(VideoQuality quality)
+		private static UIImagePickerControllerQualityType GetQuailty (VideoQuality quality)
 		{
-			switch (quality)
-			{
-				case VideoQuality.Low:
-					return UIImagePickerControllerQualityType.Low;
-				case VideoQuality.Medium:
-					return UIImagePickerControllerQualityType.Medium;
-				default:
-					return UIImagePickerControllerQualityType.High;
+			switch (quality) {
+			case VideoQuality.Low:
+				return UIImagePickerControllerQualityType.Low;
+			case VideoQuality.Medium:
+				return UIImagePickerControllerQualityType.Medium;
+			default:
+				return UIImagePickerControllerQualityType.High;
 			}
 		}
 
@@ -541,15 +506,13 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// <param name="options">The options.</param>
 		/// <exception cref="ArgumentNullException">options</exception>
 		/// <exception cref="ArgumentException">options.Directory must be a relative path;options</exception>
-		private static void VerifyOptions(MediaStorageOptions options)
+		private static void VerifyOptions (MediaStorageOptions options)
 		{
-			if (options == null)
-			{
-				throw new ArgumentNullException("options");
+			if (options == null) {
+				throw new ArgumentNullException ("options");
 			}
-			if (options.Directory != null && Path.IsPathRooted(options.Directory))
-			{
-				throw new ArgumentException("options.Directory must be a relative path", "options");
+			if (options.Directory != null && Path.IsPathRooted (options.Directory)) {
+				throw new ArgumentException ("options.Directory must be a relative path", "options");
 			}
 		}
 
@@ -558,12 +521,11 @@ namespace MediaPicker.Forms.Plugin.iOS
 		/// </summary>
 		/// <param name="options">The options.</param>
 		/// <exception cref="ArgumentException">options.Camera is not a member of CameraDevice</exception>
-		private static void VerifyCameraOptions(CameraMediaStorageOptions options)
+		private static void VerifyCameraOptions (CameraMediaStorageOptions options)
 		{
-			VerifyOptions(options);
-			if (!Enum.IsDefined(typeof(CameraDevice), options.DefaultCamera))
-			{
-				throw new ArgumentException("options.Camera is not a member of CameraDevice");
+			VerifyOptions (options);
+			if (!Enum.IsDefined (typeof(CameraDevice), options.DefaultCamera)) {
+				throw new ArgumentException ("options.Camera is not a member of CameraDevice");
 			}
 		}
 	}

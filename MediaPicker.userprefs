@@ -1,10 +1,11 @@
-﻿<Properties StartupItem="MediaPicker/MediaPicker.Forms.Plugin.Abstractions/MediaPicker.Forms.Plugin.Abstractions.csproj">
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="MediaPicker/MediaPicker.Forms.Plugin.iOS/MediaPickerImplementation.cs">
+﻿<Properties StartupItem="test/TestAndSampleApp.Droid/TestAndSampleApp.Droid.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Android.Nexus 4 (Jelly Bean)" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="test/TestAndSampleApp.Droid/MainActivity.cs">
     <Files>
-      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.Android/MediaPickerImplementation.cs" Line="50" Column="50" />
-      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.Abstractions/IMediaPicker.cs" Line="3" Column="3" />
-      <File FileName="MediaPicker/MediaPicker.Forms.Plugin.iOS/MediaPickerImplementation.cs" Line="22" Column="22" />
+      <File FileName="test/TestAndSampleApp/packages.config" Line="1" Column="1" />
+      <File FileName="test/TestAndSampleApp/App.cs" Line="1" Column="1" />
+      <File FileName="test/TestAndSampleApp.iOS/Main.cs" Line="10" Column="10" />
+      <File FileName="test/TestAndSampleApp.Droid/MainActivity.cs" Line="11" Column="11" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
