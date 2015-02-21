@@ -2,7 +2,6 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Android.App;
 using Android.Content;
 using Android.Database;
@@ -15,154 +14,243 @@ using Uri = Android.Net.Uri;
 namespace MediaPicker.Forms.Plugin.Droid
 {
 	/// <summary>
-	/// Class MediaPickerActivity.
+	///     Class MediaPickerActivity.
 	/// </summary>
 	[Activity]
 	internal class MediaPickerActivity
 		: Activity
 	{
-		#region Constants
 		/// <summary>
-		/// The extra path
+		///     The extra path
 		/// </summary>
 		internal const string ExtraPath = "path";
+
 		/// <summary>
-		/// The extra location
+		///     The extra location
 		/// </summary>
 		internal const string ExtraLocation = "location";
+
 		/// <summary>
-		/// The extra type
+		///     The extra type
 		/// </summary>
 		internal const string ExtraType = "type";
+
 		/// <summary>
-		/// The extra identifier
+		///     The extra identifier
 		/// </summary>
 		internal const string ExtraId = "id";
+
 		/// <summary>
-		/// The extra action
+		///     The extra action
 		/// </summary>
 		internal const string ExtraAction = "action";
+
 		/// <summary>
-		/// The extra tasked
+		///     The extra tasked
 		/// </summary>
 		internal const string ExtraTasked = "tasked";
 
+		internal const string ExtraMaxPixelDimension = "maxPixelDimension";
+
 		/// <summary>
-		/// The medi a_ fil e_ extr a_ name
+		///     The medi a_ fil e_ extr a_ name
 		/// </summary>
 		internal const string MediaFileExtraName = "MediaFile";
-		#endregion Constants
 
-		#region Private Member Variables
 		/// <summary>
-		/// The action
+		///     The action
 		/// </summary>
 		private string _action;
 
 		/// <summary>
-		/// The description
+		///     The description
 		/// </summary>
 		private string _description;
+
 		/// <summary>
-		/// The identifier
+		///     The identifier
 		/// </summary>
 		private int _id;
 
 		/// <summary>
-		/// The is photo
+		///     The is photo
 		/// </summary>
 		private bool _isPhoto;
 
 		/// <summary>
-		/// The user's destination path.
+		///     The user's destination path.
 		/// </summary>
 		private Uri _path;
 
 		/// <summary>
-		/// The quality
+		///     The quality
 		/// </summary>
 		private VideoQuality _quality;
+
 		/// <summary>
-		/// The seconds
+		///     The seconds
 		/// </summary>
 		private int _seconds;
 
 		/// <summary>
-		/// The tasked
+		///     The tasked
 		/// </summary>
 		private bool _tasked;
+
 		/// <summary>
-		/// The title
+		///     The title
 		/// </summary>
 		private string _title;
+
 		/// <summary>
-		/// The type
+		///     The type
 		/// </summary>
 		private string _type;
-		#endregion Private Member Variables
 
-		#region Event Handlers
 		/// <summary>
-		/// Occurs when [media picked].
+		///     Occurs when [media picked].
 		/// </summary>
 		internal static event EventHandler<MediaPickedEventArgs> MediaPicked;
-		#endregion Event Handlers
 
-		#region Methods
-		#region Overides
 		/// <summary>
-		/// Called to retrieve per-instance state from an activity before being killed
-		/// so that the state can be restored in <c><see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" /></c> or
-		/// <c><see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" /></c> (the <c><see cref="T:Android.OS.Bundle" /></c> populated by this method
-		/// will be passed to both).
+		///     Called to retrieve per-instance state from an activity before being killed
+		///     so that the state can be restored in
+		///     <c>
+		///         <see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" />
+		///     </c>
+		///     or
+		///     <c>
+		///         <see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
+		///     </c>
+		///     (the
+		///     <c>
+		///         <see cref="T:Android.OS.Bundle" />
+		///     </c>
+		///     populated by this method
+		///     will be passed to both).
 		/// </summary>
 		/// <param name="outState">Bundle in which to place your saved state.</param>
 		/// <since version="Added in API level 1" />
 		/// <altmember cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" />
 		/// <altmember cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
 		/// <altmember cref="M:Android.App.Activity.OnPause" />
-		/// <remarks><para tool="javadoc-to-mdoc">Called to retrieve per-instance state from an activity before being killed
-		/// so that the state can be restored in <c><see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" /></c> or
-		/// <c><see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" /></c> (the <c><see cref="T:Android.OS.Bundle" /></c> populated by this method
-		/// will be passed to both).
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">This method is called before an activity may be killed so that when it
-		/// comes back some time in the future it can restore its state.  For example,
-		/// if activity B is launched in front of activity A, and at some point activity
-		/// A is killed to reclaim resources, activity A will have a chance to save the
-		/// current state of its user interface via this method so that when the user
-		/// returns to activity A, the state of the user interface can be restored
-		/// via <c><see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" /></c> or <c><see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" /></c>.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">Do not confuse this method with activity lifecycle callbacks such as
-		/// <c><see cref="M:Android.App.Activity.OnPause" /></c>, which is always called when an activity is being placed
-		/// in the background or on its way to destruction, or <c><see cref="M:Android.App.Activity.OnStop" /></c> which
-		/// is called before destruction.  One example of when <c><see cref="M:Android.App.Activity.OnPause" /></c> and
-		/// <c><see cref="M:Android.App.Activity.OnStop" /></c> is called and not this method is when a user navigates back
-		/// from activity B to activity A: there is no need to call <c><see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" /></c>
-		/// on B because that particular instance will never be restored, so the
-		/// system avoids calling it.  An example when <c><see cref="M:Android.App.Activity.OnPause" /></c> is called and
-		/// not <c><see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" /></c> is when activity B is launched in front of activity A:
-		/// the system may avoid calling <c><see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" /></c> on activity A if it isn't
-		/// killed during the lifetime of B since the state of the user interface of
-		/// A will stay intact.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">The default implementation takes care of most of the UI per-instance
-		/// state for you by calling <c><see cref="M:Android.Views.View.OnSaveInstanceState" /></c> on each
-		/// view in the hierarchy that has an id, and by saving the id of the currently
-		/// focused view (all of which is restored by the default implementation of
-		/// <c><see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" /></c>).  If you override this method to save additional
-		/// information not captured by each individual view, you will likely want to
-		/// call through to the default implementation, otherwise be prepared to save
-		/// all of the state of each view yourself.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">If called, this method will occur before <c><see cref="M:Android.App.Activity.OnStop" /></c>.  There are
-		/// no guarantees about whether it will occur before or after <c><see cref="M:Android.App.Activity.OnPause" /></c>.</para>
-		/// <para tool="javadoc-to-mdoc">
-		///   <format type="text/html">
-		///     <a href="http://developer.android.com/reference/android/app/Activity.html#onSaveInstanceState(android.os.Bundle)" target="_blank">[Android Documentation]</a>
-		///   </format>
-		/// </para></remarks>
+		/// <remarks>
+		///     <para tool="javadoc-to-mdoc">
+		///         Called to retrieve per-instance state from an activity before being killed
+		///         so that the state can be restored in
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" />
+		///         </c>
+		///         or
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         (the
+		///         <c>
+		///             <see cref="T:Android.OS.Bundle" />
+		///         </c>
+		///         populated by this method
+		///         will be passed to both).
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         This method is called before an activity may be killed so that when it
+		///         comes back some time in the future it can restore its state.  For example,
+		///         if activity B is launched in front of activity A, and at some point activity
+		///         A is killed to reclaim resources, activity A will have a chance to save the
+		///         current state of its user interface via this method so that when the user
+		///         returns to activity A, the state of the user interface can be restored
+		///         via
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnCreate(Android.OS.Bundle)" />
+		///         </c>
+		///         or
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         .
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         Do not confuse this method with activity lifecycle callbacks such as
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnPause" />
+		///         </c>
+		///         , which is always called when an activity is being placed
+		///         in the background or on its way to destruction, or
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnStop" />
+		///         </c>
+		///         which
+		///         is called before destruction.  One example of when
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnPause" />
+		///         </c>
+		///         and
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnStop" />
+		///         </c>
+		///         is called and not this method is when a user navigates back
+		///         from activity B to activity A: there is no need to call
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         on B because that particular instance will never be restored, so the
+		///         system avoids calling it.  An example when
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnPause" />
+		///         </c>
+		///         is called and
+		///         not
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         is when activity B is launched in front of activity A:
+		///         the system may avoid calling
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         on activity A if it isn't
+		///         killed during the lifetime of B since the state of the user interface of
+		///         A will stay intact.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         The default implementation takes care of most of the UI per-instance
+		///         state for you by calling
+		///         <c>
+		///             <see cref="M:Android.Views.View.OnSaveInstanceState" />
+		///         </c>
+		///         on each
+		///         view in the hierarchy that has an id, and by saving the id of the currently
+		///         focused view (all of which is restored by the default implementation of
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
+		///         </c>
+		///         ).  If you override this method to save additional
+		///         information not captured by each individual view, you will likely want to
+		///         call through to the default implementation, otherwise be prepared to save
+		///         all of the state of each view yourself.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         If called, this method will occur before
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnStop" />
+		///         </c>
+		///         .  There are
+		///         no guarantees about whether it will occur before or after
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnPause" />
+		///         </c>
+		///         .
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         <format type="text/html">
+		///             <a
+		///                 href="http://developer.android.com/reference/android/app/Activity.html#onSaveInstanceState(android.os.Bundle)"
+		///                 target="_blank">
+		///                 [Android Documentation]
+		///             </a>
+		///         </format>
+		///     </para>
+		/// </remarks>
 		protected override void OnSaveInstanceState(Bundle outState)
 		{
 			outState.PutBoolean("ran", true);
@@ -172,7 +260,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 			outState.PutString(ExtraType, _type);
 			outState.PutString(ExtraAction, _action);
 			outState.PutInt(MediaStore.ExtraDurationLimit, _seconds);
-			outState.PutInt(MediaStore.ExtraVideoQuality, (int)_quality);
+			outState.PutInt(MediaStore.ExtraVideoQuality, (int) _quality);
 			outState.PutBoolean(ExtraTasked, _tasked);
 
 			if (_path != null)
@@ -182,38 +270,85 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Called when the activity is starting.
+		///     Called when the activity is starting.
 		/// </summary>
-		/// <param name="savedInstanceState">If the activity is being re-initialized after
-		/// previously being shut down then this Bundle contains the data it most
-		/// recently supplied in <c><see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" /></c>.  <format type="text/html"><b><i>Note: Otherwise it is null.</i></b></format></param>
+		/// <param name="savedInstanceState">
+		///     If the activity is being re-initialized after
+		///     previously being shut down then this Bundle contains the data it most
+		///     recently supplied in
+		///     <c>
+		///         <see cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" />
+		///     </c>
+		///     .
+		///     <format type="text/html">
+		///         <b>
+		///             <i>Note: Otherwise it is null.</i>
+		///         </b>
+		///     </format>
+		/// </param>
 		/// <since version="Added in API level 1" />
 		/// <altmember cref="M:Android.App.Activity.OnStart" />
 		/// <altmember cref="M:Android.App.Activity.OnSaveInstanceState(Android.OS.Bundle)" />
 		/// <altmember cref="M:Android.App.Activity.OnRestoreInstanceState(Android.OS.Bundle)" />
 		/// <altmember cref="M:Android.App.Activity.OnPostCreate(Android.OS.Bundle)" />
-		/// <remarks><para tool="javadoc-to-mdoc">Called when the activity is starting.  This is where most initialization
-		/// should go: calling <c><see cref="M:Android.App.Activity.SetContentView(System.Int32)" /></c> to inflate the
-		/// activity's UI, using <c><see cref="M:Android.App.Activity.FindViewById(System.Int32)" /></c> to programmatically interact
-		/// with widgets in the UI, calling
-		/// <c><see cref="M:Android.App.Activity.ManagedQuery(Android.Net.Uri, System.String[], System.String[], System.String[], System.String[])" /></c> to retrieve
-		/// cursors for data being displayed, etc.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">You can call <c><see cref="M:Android.App.Activity.Finish" /></c> from within this function, in
-		/// which case onDestroy() will be immediately called without any of the rest
-		/// of the activity lifecycle (<c><see cref="M:Android.App.Activity.OnStart" /></c>, <c><see cref="M:Android.App.Activity.OnResume" /></c>,
-		/// <c><see cref="M:Android.App.Activity.OnPause" /></c>, etc) executing.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">
-		///   <i>Derived classes must call through to the super class's
-		/// implementation of this method.  If they do not, an exception will be
-		/// thrown.</i>
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">
-		///   <format type="text/html">
-		///     <a href="http://developer.android.com/reference/android/app/Activity.html#onCreate(android.os.Bundle)" target="_blank">[Android Documentation]</a>
-		///   </format>
-		/// </para></remarks>
+		/// <remarks>
+		///     <para tool="javadoc-to-mdoc">
+		///         Called when the activity is starting.  This is where most initialization
+		///         should go: calling
+		///         <c>
+		///             <see cref="M:Android.App.Activity.SetContentView(System.Int32)" />
+		///         </c>
+		///         to inflate the
+		///         activity's UI, using
+		///         <c>
+		///             <see cref="M:Android.App.Activity.FindViewById(System.Int32)" />
+		///         </c>
+		///         to programmatically interact
+		///         with widgets in the UI, calling
+		///         <c>
+		///             <see
+		///                 cref="M:Android.App.Activity.ManagedQuery(Android.Net.Uri, System.String[], System.String[], System.String[], System.String[])" />
+		///         </c>
+		///         to retrieve
+		///         cursors for data being displayed, etc.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         You can call
+		///         <c>
+		///             <see cref="M:Android.App.Activity.Finish" />
+		///         </c>
+		///         from within this function, in
+		///         which case onDestroy() will be immediately called without any of the rest
+		///         of the activity lifecycle (
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnStart" />
+		///         </c>
+		///         ,
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnResume" />
+		///         </c>
+		///         ,
+		///         <c>
+		///             <see cref="M:Android.App.Activity.OnPause" />
+		///         </c>
+		///         , etc) executing.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         <i>
+		///             Derived classes must call through to the super class's
+		///             implementation of this method.  If they do not, an exception will be
+		///             thrown.
+		///         </i>
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         <format type="text/html">
+		///             <a href="http://developer.android.com/reference/android/app/Activity.html#onCreate(android.os.Bundle)"
+		///                 target="_blank">
+		///                 [Android Documentation]
+		///             </a>
+		///         </format>
+		///     </para>
+		/// </remarks>
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
 			base.OnCreate(savedInstanceState);
@@ -253,7 +388,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 						}
 					}
 
-					_quality = (VideoQuality)b.GetInt(MediaStore.ExtraVideoQuality, (int)VideoQuality.High);
+					_quality = (VideoQuality) b.GetInt(MediaStore.ExtraVideoQuality, (int) VideoQuality.High);
 					pickIntent.PutExtra(MediaStore.ExtraVideoQuality, GetVideoQuality(_quality));
 
 					if (!ran)
@@ -284,34 +419,57 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Called when an activity you launched exits, giving you the requestCode
-		/// you started it with, the resultCode it returned, and any additional
-		/// data from it.
+		///     Called when an activity you launched exits, giving you the requestCode
+		///     you started it with, the resultCode it returned, and any additional
+		///     data from it.
 		/// </summary>
-		/// <param name="requestCode">The integer request code originally supplied to
-		/// startActivityForResult(), allowing you to identify who this
-		/// result came from.</param>
-		/// <param name="resultCode">The integer result code returned by the child activity
-		/// through its setResult().</param>
-		/// <param name="data">An Intent, which can return result data to the caller
-		/// (various data can be attached to Intent "extras").</param>
+		/// <param name="requestCode">
+		///     The integer request code originally supplied to
+		///     startActivityForResult(), allowing you to identify who this
+		///     result came from.
+		/// </param>
+		/// <param name="resultCode">
+		///     The integer result code returned by the child activity
+		///     through its setResult().
+		/// </param>
+		/// <param name="data">
+		///     An Intent, which can return result data to the caller
+		///     (various data can be attached to Intent "extras").
+		/// </param>
 		/// <since version="Added in API level 1" />
 		/// <altmember cref="M:Android.App.Activity.StartActivityForResult(Android.Content.Intent, System.Int32)" />
-		/// <altmember cref="M:Android.App.Activity.CreatePendingResult(System.Int32, Android.Content.Intent, Android.Content.Intent)" />
+		/// <altmember
+		///     cref="M:Android.App.Activity.CreatePendingResult(System.Int32, Android.Content.Intent, Android.Content.Intent)" />
 		/// <altmember cref="M:Android.App.Activity.SetResult(Android.App.Result)" />
-		/// <remarks><para tool="javadoc-to-mdoc">Called when an activity you launched exits, giving you the requestCode
-		/// you started it with, the resultCode it returned, and any additional
-		/// data from it.  The <format type="text/html"><var>resultCode</var></format> will be
-		/// <c><see cref="F:Android.App.Result.Canceled" /></c> if the activity explicitly returned that,
-		/// didn't return any result, or crashed during its operation.
-		/// </para>
-		/// <para tool="javadoc-to-mdoc">You will receive this call immediately before onResume() when your
-		/// activity is re-starting.</para>
-		/// <para tool="javadoc-to-mdoc">
-		///   <format type="text/html">
-		///     <a href="http://developer.android.com/reference/android/app/Activity.html#onActivityResult(int, int, android.content.Intent)" target="_blank">[Android Documentation]</a>
-		///   </format>
-		/// </para></remarks>
+		/// <remarks>
+		///     <para tool="javadoc-to-mdoc">
+		///         Called when an activity you launched exits, giving you the requestCode
+		///         you started it with, the resultCode it returned, and any additional
+		///         data from it.  The
+		///         <format type="text/html">
+		///             <var>resultCode</var>
+		///         </format>
+		///         will be
+		///         <c>
+		///             <see cref="F:Android.App.Result.Canceled" />
+		///         </c>
+		///         if the activity explicitly returned that,
+		///         didn't return any result, or crashed during its operation.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         You will receive this call immediately before onResume() when your
+		///         activity is re-starting.
+		///     </para>
+		///     <para tool="javadoc-to-mdoc">
+		///         <format type="text/html">
+		///             <a
+		///                 href="http://developer.android.com/reference/android/app/Activity.html#onActivityResult(int, int, android.content.Intent)"
+		///                 target="_blank">
+		///                 [Android Documentation]
+		///             </a>
+		///         </format>
+		///     </para>
+		/// </remarks>
 		protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
 		{
 			base.OnActivityResult(requestCode, resultCode, data);
@@ -346,11 +504,9 @@ namespace MediaPicker.Forms.Plugin.Droid
 				Finish();
 			}
 		}
-		#endregion Overides
 
-		#region Private Static Methods
 		/// <summary>
-		/// Gets the media file asynchronous.
+		///     Gets the media file asynchronous.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="requestCode">The request code.</param>
@@ -396,7 +552,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 
 			return pathFuture.ContinueWith(t =>
 			{
-				string resultPath = t.Result.Item1;
+				var resultPath = t.Result.Item1;
 				if (resultPath != null && File.Exists(t.Result.Item1))
 				{
 					if (t.Result.Item2)
@@ -413,7 +569,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Tries the move file asynchronous.
+		///     Tries the move file asynchronous.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="url">The URL.</param>
@@ -422,7 +578,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 		/// <returns>Task&lt;System.Boolean&gt;.</returns>
 		private static Task<bool> TryMoveFileAsync(Context context, Uri url, Uri path, bool isPhoto)
 		{
-			string moveTo = GetLocalPath(path);
+			var moveTo = GetLocalPath(path);
 			return GetFileForUriAsync(context, url, isPhoto).ContinueWith(t =>
 			{
 				if (t.Result.Item1 == null)
@@ -439,7 +595,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Gets the video quality.
+		///     Gets the video quality.
 		/// </summary>
 		/// <param name="videoQuality">The video quality.</param>
 		/// <returns>System.Int32.</returns>
@@ -457,14 +613,17 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Gets the output media file.
+		///     Gets the output media file.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="subdir">The subdir.</param>
 		/// <param name="name">The name.</param>
 		/// <param name="isPhoto">if set to <c>true</c> [is photo].</param>
 		/// <returns>Uri.</returns>
-		/// <exception cref="System.IO.IOException">Couldn't create directory, have you added the WRITE_EXTERNAL_STORAGE permission?</exception>
+		/// <exception cref="System.IO.IOException">
+		///     Couldn't create directory, have you added the WRITE_EXTERNAL_STORAGE
+		///     permission?
+		/// </exception>
 		private static Uri GetOutputMediaFile(Context context, string subdir, string name, bool isPhoto)
 		{
 			subdir = subdir ?? String.Empty;
@@ -487,12 +646,14 @@ namespace MediaPicker.Forms.Plugin.Droid
 						nomedia.CreateNewFile();
 				}
 
-				return Uri.FromFile(new Java.IO.File(MediaFileHelpers.GetUniqueMediaFileWithPath(isPhoto, mediaStorageDir.Path, name, File.Exists)));
+				return
+					Uri.FromFile(
+						new Java.IO.File(MediaFileHelpers.GetUniqueMediaFileWithPath(isPhoto, mediaStorageDir.Path, name, File.Exists)));
 			}
 		}
 
 		/// <summary>
-		/// Gets the file for URI asynchronous.
+		///     Gets the file for URI asynchronous.
 		/// </summary>
 		/// <param name="context">The context.</param>
 		/// <param name="uri">The URI.</param>
@@ -516,13 +677,13 @@ namespace MediaPicker.Forms.Plugin.Droid
 							tcs.SetResult(new Tuple<string, bool>(null, false));
 						else
 						{
-							int column = cursor.GetColumnIndex(MediaStore.MediaColumns.Data);
+							var column = cursor.GetColumnIndex(MediaStore.MediaColumns.Data);
 							string contentPath = null;
 
 							if (column != -1)
 								contentPath = cursor.GetString(column);
 
-							bool copied = false;
+							var copied = false;
 
 							// If they don't follow the "rules", try to copy the file locally
 							//							if (contentPath == null || !contentPath.StartsWith("file"))
@@ -566,7 +727,7 @@ namespace MediaPicker.Forms.Plugin.Droid
 		}
 
 		/// <summary>
-		/// Gets the local path.
+		///     Gets the local path.
 		/// </summary>
 		/// <param name="uri">The URI.</param>
 		/// <returns>System.String.</returns>
@@ -574,11 +735,9 @@ namespace MediaPicker.Forms.Plugin.Droid
 		{
 			return new System.Uri(uri.ToString()).LocalPath;
 		}
-		#endregion Private Static Methods
 
-		#region Private Methods
 		/// <summary>
-		/// Touches this instance.
+		///     Touches this instance.
 		/// </summary>
 		private void Touch()
 		{
@@ -587,13 +746,11 @@ namespace MediaPicker.Forms.Plugin.Droid
 
 			File.Create(GetLocalPath(_path)).Close();
 		}
-		#endregion Private Methods
 
-		#region Raise Event Handlers
 		/// <summary>
-		/// Handles the <see cref="E:MediaPicked" /> event.
+		///     Handles the <see cref="E:MediaPicked" /> event.
 		/// </summary>
-		/// <param name="e">The <see cref="MediaPickedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="MediaPickedEventArgs" /> instance containing the event data.</param>
 		private static void RaiseOnMediaPicked(MediaPickedEventArgs e)
 		{
 			var picked = MediaPicked;
@@ -602,94 +759,5 @@ namespace MediaPicker.Forms.Plugin.Droid
 				picked(null, e);
 			}
 		}
-		#endregion Raise Event Handlers
-		#endregion Methods
-	}
-
-	/// <summary>
-	/// Class MediaPickedEventArgs.
-	/// </summary>
-	internal class MediaPickedEventArgs
-		: EventArgs
-	{
-		#region Constructors
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MediaPickedEventArgs"/> class.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="error">The error.</param>
-		/// <exception cref="System.ArgumentNullException">error</exception>
-		public MediaPickedEventArgs(int id, Exception error)
-		{
-			if (error == null)
-				throw new ArgumentNullException("error");
-
-			RequestId = id;
-			Error = error;
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MediaPickedEventArgs"/> class.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="isCanceled">if set to <c>true</c> [is canceled].</param>
-		/// <param name="media">The media.</param>
-		/// <exception cref="System.ArgumentNullException">media</exception>
-		public MediaPickedEventArgs(int id, bool isCanceled, MediaFile media = null)
-		{
-			RequestId = id;
-			IsCanceled = isCanceled;
-			if (!IsCanceled && media == null)
-				throw new ArgumentNullException("media");
-
-			Media = media;
-		}
-		#endregion Constructors
-
-		#region Public Properties
-		/// <summary>
-		/// Gets the request identifier.
-		/// </summary>
-		/// <value>The request identifier.</value>
-		public int RequestId { get; private set; }
-
-		/// <summary>
-		/// Gets a value indicating whether this instance is canceled.
-		/// </summary>
-		/// <value><c>true</c> if this instance is canceled; otherwise, <c>false</c>.</value>
-		public bool IsCanceled { get; private set; }
-
-		/// <summary>
-		/// Gets the error.
-		/// </summary>
-		/// <value>The error.</value>
-		public Exception Error { get; private set; }
-
-		/// <summary>
-		/// Gets the media.
-		/// </summary>
-		/// <value>The media.</value>
-		public MediaFile Media { get; private set; }
-		#endregion Public Properties
-
-		#region Public Methods
-		/// <summary>
-		/// To the task.
-		/// </summary>
-		/// <returns>Task&lt;MediaFile&gt;.</returns>
-		public Task<MediaFile> ToTask()
-		{
-			var tcs = new TaskCompletionSource<MediaFile>();
-
-			if (IsCanceled)
-				tcs.SetCanceled();
-			else if (Error != null)
-				tcs.SetException(Error);
-			else
-				tcs.SetResult(Media);
-
-			return tcs.Task;
-		}
-		#endregion Public Methods
 	}
 }

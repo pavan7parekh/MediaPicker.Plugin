@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using MediaPicker.Forms.Plugin.Abstractions;
 using Xamarin.Forms;
 
@@ -47,6 +48,13 @@ namespace TestAndSampleApp
 				BackgroundColor = Color.Blue
 			};
 
+			var smallerImage = new Image()
+			{
+				HeightRequest = 100,
+				WidthRequest = 100,
+				BackgroundColor = Color.Pink
+			};
+
 			var button = new Button()
 			{
 				Text = "Take a picture",
@@ -68,6 +76,11 @@ namespace TestAndSampleApp
 							status.Text = "WE GOT A PHOTO!";
 							imageSource = ImageSource.FromStream(() => mediaFile.Source);
 							image.Source = ImageSource.FromStream(() => mediaFile.Source);
+
+							
+							var smaller = media.ResizeImage(mediaFile.Source, 50, 50);
+							smallerImage.Source = ImageSource.FromStream(() => smaller);
+
 						}
 					}, scheduler);
 				})
@@ -87,7 +100,8 @@ namespace TestAndSampleApp
 					},
 					button,
 					status,
-					image
+					image,
+					smallerImage
 				}
 			};
 		}

@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>detroitpro.Forms.Plugin.MediaPicker</id>
-       <version>0.0.2</version>
+       <version>0.0.7</version>
        <title>MediaPicker Plugin for Xamarin.Forms</title>
        <authors>Eric Polerecky</authors>
        <owners>Eric Polerecky</owners>
@@ -10,10 +10,8 @@
        <projectUrl>https://github.com/detroitpro/MediaPicker.Plugin</projectUrl>
      <iconUrl>https://raw.githubusercontent.com/jamesmontemagno/Xamarin-Templates/master/Plugins-Templates/icons/plugin_icon_nuget.png</iconUrl>
      <requireLicenseAcceptance>false</requireLicenseAcceptance>
-       <description>
-         Long description for your plugin.
-       </description>
-       <summary>Short description for your plugin.</summary>
+       <description>Select or take photos, based on media picker from XLabs</description>
+       <summary>Select or take photos, based on media picker from XLabs</summary>
        <tags>xamarin, pcl, xam.pcl, plugin, plugin for xamarin.forms, windows phone, winphone, wp8, android, xamarin.forms, ios, media, camera, photos</tags>
        <dependencies>
        </dependencies>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MediaPicker.Forms.Plugin.Abstractions
@@ -68,6 +69,8 @@ namespace MediaPicker.Forms.Plugin.Abstractions
 
 
 		byte[] ResizeImage (byte[] imageData, float width, float height);
+
+		Stream ResizeImage(Stream imageData, float width, float height);
 
 	}
 

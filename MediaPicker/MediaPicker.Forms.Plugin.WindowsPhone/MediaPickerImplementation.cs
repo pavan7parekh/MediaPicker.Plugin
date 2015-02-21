@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 
 using Microsoft.Devices;
+using Microsoft.Phone;
 using Microsoft.Phone.Tasks;
 
 [assembly: Dependency(typeof(MediaPickerImplementation))]
@@ -37,7 +38,7 @@ namespace MediaPicker.Forms.Plugin.WindowsPhone
 
 			_photoChooser.ShowCamera = false;
 
-			IsCameraAvailable =	(Camera.IsCameraTypeSupported(CameraType.Primary) || Camera.IsCameraTypeSupported(CameraType.FrontFacing));
+			IsCameraAvailable = (Camera.IsCameraTypeSupported(CameraType.Primary) || Camera.IsCameraTypeSupported(CameraType.FrontFacing));
 
 			IsPhotosSupported = true; //TODO: Check.
 			IsVideosSupported = IsCameraAvailable;
@@ -171,6 +172,43 @@ namespace MediaPicker.Forms.Plugin.WindowsPhone
 		/// </summary>
 		/// <value>The on error.</value>
 		public EventHandler<MediaPickerErrorArgs> OnError { get; set; }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="imageData"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <returns></returns>
+		public byte[] ResizeImage(byte[] imageData, float width, float height)
+		{
+			byte[] resizedData;
+
+			using (var streamIn = new MemoryStream(imageData))
+			{
+				var bitmap = PictureDecoder.DecodeJpeg(streamIn, (int)width, (int)height);
+
+				using (var streamOut = new MemoryStream())
+				{
+					bitmap.SaveJpeg(streamOut, (int)width, (int)height, 0, 100);
+					resizedData = streamOut.ToArray();
+				}
+			}
+			return resizedData;
+		}
+
+
+		public Stream ResizeImage(Stream imageData, float width, float height)
+		{
+			var bitmap = PictureDecoder.DecodeJpeg(imageData, (int)width, (int)height);
+			using (var streamOut = new MemoryStream())
+			{
+				bitmap.SaveJpeg(streamOut, (int)width, (int)height, 0, 100);
+				return streamOut;
+			}
+		}
+
+
 
 		#endregion Event Handlers
 
