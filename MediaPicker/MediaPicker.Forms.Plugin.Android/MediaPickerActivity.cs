@@ -541,11 +541,10 @@ namespace MediaPicker.Forms.Plugin.Droid
 						dispose = d => File.Delete (resultPath);
 					}
 
+					//TODO: this is where we setup the response. 
+					var mediaFile = new MediaFile (resultPath, () => GetStream (t.Result.Item1, isPhoto, maxPixelDimension, percentQuality), dispose);
 
-					//TODO: if file exists, check if we need to resize it.s
-					var mf = new MediaFile (resultPath, () => GetStream (t.Result.Item1, isPhoto, maxPixelDimension, percentQuality), dispose);
-
-					return new MediaPickedEventArgs (requestCode, false, mf);
+					return new MediaPickedEventArgs (requestCode, false, mediaFile);
 				}
 				return new MediaPickedEventArgs (requestCode, new MediaFileNotFoundException (originalPath));
 			});
