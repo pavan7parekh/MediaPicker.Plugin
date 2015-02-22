@@ -1,5 +1,4 @@
-﻿using System.IO;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using MediaPicker.Forms.Plugin.Abstractions;
 using Xamarin.Forms;
 using System;
@@ -35,8 +34,8 @@ namespace TestAndSampleApp
 	{
 		public MainContentPage ()
 		{
-			IMediaPicker media = DependencyService.Get<IMediaPicker> ();
-			TaskScheduler scheduler = TaskScheduler.FromCurrentSynchronizationContext ();
+			var media = DependencyService.Get<IMediaPicker> ();
+			var scheduler = TaskScheduler.FromCurrentSynchronizationContext ();
 
 			var status = new Label () {
 				XAlign = TextAlignment.Center

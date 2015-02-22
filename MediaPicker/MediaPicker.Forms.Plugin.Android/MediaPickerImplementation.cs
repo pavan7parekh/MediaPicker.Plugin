@@ -1,278 +1,300 @@
-using MediaPicker.Forms.Plugin.Abstractions;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Android.Content;
 using Android.Content.PM;
+using Android.Graphics;
 using Android.OS;
 using Android.Provider;
-using Xamarin.Forms;
+using MediaPicker.Forms.Plugin.Abstractions;
 using MediaPicker.Forms.Plugin.Droid;
-using Android.App;
+using Xamarin.Forms;
 using Application = Android.App.Application;
-using Android.Graphics;
-using System.IO;
 
+[assembly: Dependency(typeof (MediaPickerImplementation))]
 
-[assembly: Dependency (typeof(MediaPickerImplementation))]
 namespace MediaPicker.Forms.Plugin.Droid
 {
-	/// <summary>
-	/// MediaPicker Implementation
-	/// </summary>
-	public class MediaPickerImplementation : IMediaPicker
-	{
-		/// <summary>
-		/// Used for registration with dependency service
-		/// </summary>
-		public static void Init ()
-		{
-		}
+    /// <summary>
+    ///     MediaPicker Implementation
+    /// </summary>
+    public class MediaPickerImplementation : IMediaPicker
+    {
+        private TaskCompletionSource<MediaFile> _completionSource;
+        private int _requestId;
 
-		public byte[] ResizeImage (byte[] imageData, float width, float height)
-		{
-			// Load the bitmap
-			Bitmap originalImage = BitmapFactory.DecodeByteArray (imageData, 0, imageData.Length);
-			Bitmap resizedImage = Bitmap.CreateScaledBitmap (originalImage, (int)width, (int)height, false);
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="MediaPicker" /> class.
+        /// </summary>
+        public MediaPickerImplementation()
+        {
+            IsPhotosSupported = true;
+            IsVideosSupported = true;
+        }
 
-			using (MemoryStream ms = new MemoryStream ()) {
-				resizedImage.Compress (Bitmap.CompressFormat.Jpeg, 100, ms);
-				return ms.ToArray ();
-			}
-		}
+        private static Context Context
+        {
+            get { return Application.Context; }
+        }
 
-		public Stream ResizeImage (Stream imageData, float width, float height)
-		{
-			// Load the bitmap
-			Bitmap originalImage = BitmapFactory.DecodeStream (imageData);
-			Bitmap resizedImage = Bitmap.CreateScaledBitmap (originalImage, (int)width, (int)height, false);
+        public byte[] ResizeImage(byte[] imageData, float width, float height)
+        {
+            // Load the bitmap
+            var originalImage = BitmapFactory.DecodeByteArray(imageData, 0, imageData.Length);
+            var resizedImage = Bitmap.CreateScaledBitmap(originalImage, (int) width, (int) height, false);
 
-			using (MemoryStream ms = new MemoryStream ()) {
-				resizedImage.Compress (Bitmap.CompressFormat.Jpeg, 100, ms);
-				return ms;
-			}
-		}
+            using (var ms = new MemoryStream())
+            {
+                resizedImage.Compress(Bitmap.CompressFormat.Jpeg, 100, ms);
+                return ms.ToArray();
+            }
+        }
+
+        public Stream ResizeImage(Stream imageData, float width, float height)
+        {
+            // Load the bitmap
+            var originalImage = BitmapFactory.DecodeStream(imageData);
+            var resizedImage = Bitmap.CreateScaledBitmap(originalImage, (int) width, (int) height, false);
+
+            using (var ms = new MemoryStream())
+            {
+                resizedImage.Compress(Bitmap.CompressFormat.Jpeg, 100, ms);
+                return ms;
+            }
+        }
+
+        /// <summary>
+        ///     Gets a value indicating whether this instance is camera available.
+        /// </summary>
+        /// <value><c>true</c> if this instance is camera available; otherwise, <c>false</c>.</value>
+        public bool IsCameraAvailable
+        {
+            get
+            {
+                var isCameraAvailable = Context.PackageManager.HasSystemFeature(PackageManager.FeatureCamera);
+
+                if (Build.VERSION.SdkInt >= BuildVersionCodes.Gingerbread)
+                {
+                    isCameraAvailable |= Context.PackageManager.HasSystemFeature(PackageManager.FeatureCameraFront);
+                }
+
+                return isCameraAvailable;
+            }
+        }
+
+        /// <summary>
+        ///     Gets a value indicating whether this instance is photos supported.
+        /// </summary>
+        /// <value><c>true</c> if this instance is photos supported; otherwise, <c>false</c>.</value>
+        public bool IsPhotosSupported { get; private set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this instance is videos supported.
+        /// </summary>
+        /// <value><c>true</c> if this instance is videos supported; otherwise, <c>false</c>.</value>
+        public bool IsVideosSupported { get; private set; }
+
+        /// <summary>
+        ///     Select a picture from library.
+        /// </summary>
+        /// <param name="options">The storage options.</param>
+        /// <returns>Task with a return type of MediaFile.</returns>
+        /// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
+        public Task<MediaFile> SelectPhotoAsync(CameraMediaStorageOptions options)
+        {
+            if (!IsCameraAvailable)
+            {
+                throw new NotSupportedException();
+            }
+
+            options.VerifyOptions();
+
+            return TakeMediaAsync("image/*", Intent.ActionPick, options);
+        }
+
+        /// <summary>
+        ///     Takes the picture.
+        /// </summary>
+        /// <param name="options">The storage options.</param>
+        /// <returns>Task with a return type of MediaFile.</returns>
+        /// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
+        public Task<MediaFile> TakePhotoAsync(CameraMediaStorageOptions options)
+        {
+            if (!IsCameraAvailable)
+            {
+                throw new NotSupportedException("Camera is not available.");
+            }
+
+            options.VerifyOptions();
+
+            return TakeMediaAsync("image/*", MediaStore.ActionImageCapture, options);
+        }
+
+        /// <summary>
+        ///     Selects the video asynchronous.
+        /// </summary>
+        /// <param name="options">Video storage options.</param>
+        /// <returns>Task with a return type of MediaFile.</returns>
+        /// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
+        public Task<MediaFile> SelectVideoAsync(VideoMediaStorageOptions options)
+        {
+            if (!IsCameraAvailable)
+            {
+                throw new NotSupportedException();
+            }
+
+            options.VerifyOptions();
+
+            return TakeMediaAsync("video/*", Intent.ActionPick, options);
+        }
+
+        /// <summary>
+        ///     Takes the video asynchronous.
+        /// </summary>
+        /// <param name="options">The options.</param>
+        /// <returns>Task with a return type of MediaFile.</returns>
+        /// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
+        public Task<MediaFile> TakeVideoAsync(VideoMediaStorageOptions options)
+        {
+            if (!IsCameraAvailable)
+            {
+                throw new NotSupportedException();
+            }
+
+            options.VerifyOptions();
+
+            return TakeMediaAsync("video/*", MediaStore.ActionVideoCapture, options);
+        }
+
+        /// <summary>
+        ///     Gets or sets the event that fires when media has been selected.
+        /// </summary>
+        /// <value>The on photo selected.</value>
+        public EventHandler<MediaPickerArgs> OnMediaSelected { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the on error.
+        /// </summary>
+        /// <value>The on error.</value>
+        public EventHandler<MediaPickerErrorArgs> OnError { get; set; }
+
+        /// <summary>
+        ///     Used for registration with dependency service
+        /// </summary>
+        public static void Init()
+        {
+        }
+
+        /// <summary>
+        ///     Creates the media intent.
+        /// </summary>
+        /// <param name="id">The identifier.</param>
+        /// <param name="type">The type of intent.</param>
+        /// <param name="action">The action.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="tasked">if set to <c>true</c> [tasked].</param>
+        /// <returns>Intent to create media.</returns>
+        private Intent CreateMediaIntent(int id, string type, string action, MediaStorageOptions options,
+            bool tasked = true)
+        {
+            var pickerIntent = new Intent(Context, typeof (MediaPickerActivity));
+            pickerIntent.SetFlags(ActivityFlags.NewTask);
+            pickerIntent.PutExtra(MediaPickerActivity.ExtraId, id);
+            pickerIntent.PutExtra(MediaPickerActivity.ExtraType, type);
+            pickerIntent.PutExtra(MediaPickerActivity.ExtraAction, action);
+            pickerIntent.PutExtra(MediaPickerActivity.ExtraTasked, tasked);
+
+            if (options != null)
+            {
+                pickerIntent.PutExtra(MediaPickerActivity.ExtraPath, options.Directory);
+                pickerIntent.PutExtra(MediaStore.Images.ImageColumns.Title, options.Name);
+                if (options.MaxPixelDimension.HasValue)
+                    pickerIntent.PutExtra(MediaPickerActivity.ExtraMaxPixelDimension, options.MaxPixelDimension.Value);
+
+                if (options.PercentQuality.HasValue)
+                    pickerIntent.PutExtra(MediaPickerActivity.ExtraPercentQuality, options.PercentQuality.Value);
 
 
-		private TaskCompletionSource<MediaFile> _completionSource;
-		private int _requestId;
+                var vidOptions = options as VideoMediaStorageOptions;
+                if (vidOptions != null)
+                {
+                    pickerIntent.PutExtra(MediaStore.ExtraDurationLimit, (int) vidOptions.DesiredLength.TotalSeconds);
+                    pickerIntent.PutExtra(MediaStore.ExtraVideoQuality, (int) vidOptions.Quality);
+                }
+            }
 
-		private static Context Context {
-			get { return Application.Context; }
-		}
+            return pickerIntent;
+        }
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="MediaPicker"/> class.
-		/// </summary>
-		public MediaPickerImplementation ()
-		{
-			IsPhotosSupported = true;
-			IsVideosSupported = true;
-		}
+        /// <summary>
+        ///     Gets the request identifier.
+        /// </summary>
+        /// <returns>Request id as integer.</returns>
+        private int GetRequestId()
+        {
+            var id = _requestId;
+            if (_requestId == int.MaxValue)
+            {
+                _requestId = 0;
+            }
+            else
+            {
+                _requestId++;
+            }
 
-		/// <summary>	
-		/// Gets a value indicating whether this instance is camera available.
-		/// </summary>
-		/// <value><c>true</c> if this instance is camera available; otherwise, <c>false</c>.</value>
-		public bool IsCameraAvailable {
-			get {
-				var isCameraAvailable = Context.PackageManager.HasSystemFeature (PackageManager.FeatureCamera);
+            return id;
+        }
 
-				if (Build.VERSION.SdkInt >= BuildVersionCodes.Gingerbread) {
-					isCameraAvailable |= Context.PackageManager.HasSystemFeature (PackageManager.FeatureCameraFront);
-				}
+        /// <summary>
+        ///     Takes the media asynchronous.
+        /// </summary>
+        /// <param name="type">The type of intent.</param>
+        /// <param name="action">The action.</param>
+        /// <param name="options">The options.</param>
+        /// <returns>Task with a return type of MediaFile.</returns>
+        /// <exception cref="System.InvalidOperationException">Only one operation can be active at a time.</exception>
+        private Task<MediaFile> TakeMediaAsync(string type, string action, MediaStorageOptions options)
+        {
+            var id = GetRequestId();
 
-				return isCameraAvailable;
-			}
-		}
+            var ntcs = new TaskCompletionSource<MediaFile>(id);
+            if (Interlocked.CompareExchange(ref _completionSource, ntcs, null) != null)
+            {
+                throw new InvalidOperationException("Only one operation can be active at a time");
+            }
 
-		/// <summary>
-		///     Gets a value indicating whether this instance is photos supported.
-		/// </summary>
-		/// <value><c>true</c> if this instance is photos supported; otherwise, <c>false</c>.</value>
-		public bool IsPhotosSupported { get; private set; }
+            Context.StartActivity(CreateMediaIntent(id, type, action, options));
 
-		/// <summary>
-		///     Gets a value indicating whether this instance is videos supported.
-		/// </summary>
-		/// <value><c>true</c> if this instance is videos supported; otherwise, <c>false</c>.</value>
-		public bool IsVideosSupported { get; private set; }
+            EventHandler<MediaPickedEventArgs> handler = null;
+            handler = (s, e) =>
+            {
+                var tcs = Interlocked.Exchange(ref _completionSource, null);
 
-		/// <summary>
-		/// Select a picture from library.
-		/// </summary>
-		/// <param name="options">The storage options.</param>
-		/// <returns>Task with a return type of MediaFile.</returns>
-		/// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
-		public Task<MediaFile> SelectPhotoAsync (CameraMediaStorageOptions options)
-		{
-			if (!IsCameraAvailable) {
-				throw new NotSupportedException ();
-			}
+                MediaPickerActivity.MediaPicked -= handler;
 
-			options.VerifyOptions ();
+                if (e.RequestId != id)
+                {
+                    return;
+                }
 
-			return TakeMediaAsync ("image/*", Intent.ActionPick, options);
-		}
+                if (e.Error != null)
+                {
+                    tcs.SetException(e.Error);
+                }
+                else if (e.IsCanceled)
+                {
+                    tcs.SetCanceled();
+                }
+                else
+                {
+                    tcs.SetResult(e.Media);
+                }
+            };
 
-		/// <summary>
-		/// Takes the picture.
-		/// </summary>
-		/// <param name="options">The storage options.</param>
-		/// <returns>Task with a return type of MediaFile.</returns>
-		/// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
-		public Task<MediaFile> TakePhotoAsync (CameraMediaStorageOptions options)
-		{
-			if (!IsCameraAvailable) {
-				throw new NotSupportedException ("Camera is not available.");
-			}
+            MediaPickerActivity.MediaPicked += handler;
 
-			options.VerifyOptions ();
-
-			return TakeMediaAsync ("image/*", MediaStore.ActionImageCapture, options);
-		}
-
-		/// <summary>
-		/// Selects the video asynchronous.
-		/// </summary>
-		/// <param name="options">Video storage options.</param>
-		/// <returns>Task with a return type of MediaFile.</returns>
-		/// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
-		public Task<MediaFile> SelectVideoAsync (VideoMediaStorageOptions options)
-		{
-			if (!IsCameraAvailable) {
-				throw new NotSupportedException ();
-			}
-
-			options.VerifyOptions ();
-
-			return TakeMediaAsync ("video/*", Intent.ActionPick, options);
-		}
-
-		/// <summary>
-		/// Takes the video asynchronous.
-		/// </summary>
-		/// <param name="options">The options.</param>
-		/// <returns>Task with a return type of MediaFile.</returns>
-		/// <exception cref="System.NotSupportedException">Throws an exception if feature is not supported.</exception>
-		public Task<MediaFile> TakeVideoAsync (VideoMediaStorageOptions options)
-		{
-			if (!IsCameraAvailable) {
-				throw new NotSupportedException ();
-			}
-
-			options.VerifyOptions ();
-
-			return TakeMediaAsync ("video/*", MediaStore.ActionVideoCapture, options);
-		}
-
-		/// <summary>
-		/// Gets or sets the event that fires when media has been selected.
-		/// </summary>
-		/// <value>The on photo selected.</value>
-		public EventHandler<MediaPickerArgs> OnMediaSelected { get; set; }
-
-		/// <summary>
-		///     Gets or sets the on error.
-		/// </summary>
-		/// <value>The on error.</value>
-		public EventHandler<MediaPickerErrorArgs> OnError { get; set; }
-
-		/// <summary>
-		/// Creates the media intent.
-		/// </summary>
-		/// <param name="id">The identifier.</param>
-		/// <param name="type">The type of intent.</param>
-		/// <param name="action">The action.</param>
-		/// <param name="options">The options.</param>
-		/// <param name="tasked">if set to <c>true</c> [tasked].</param>
-		/// <returns>Intent to create media.</returns>
-		private Intent CreateMediaIntent (int id, string type, string action, MediaStorageOptions options, bool tasked = true)
-		{
-			var pickerIntent = new Intent (Context, typeof(MediaPickerActivity));
-			pickerIntent.SetFlags (ActivityFlags.NewTask);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraId, id);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraType, type);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraAction, action);
-			pickerIntent.PutExtra (MediaPickerActivity.ExtraTasked, tasked);
-
-			if (options != null) {
-				pickerIntent.PutExtra (MediaPickerActivity.ExtraPath, options.Directory);
-				pickerIntent.PutExtra (MediaStore.Images.ImageColumns.Title, options.Name);
-				if (options.MaxPixelDimension.HasValue)
-					pickerIntent.PutExtra (MediaPickerActivity.ExtraMaxPixelDimension, options.MaxPixelDimension.Value);
-
-				if (options.PercentQuality.HasValue)
-					pickerIntent.PutExtra (MediaPickerActivity.ExtraPercentQuality, options.PercentQuality.Value);
-
-
-				var vidOptions = options as VideoMediaStorageOptions;
-				if (vidOptions != null) {
-					pickerIntent.PutExtra (MediaStore.ExtraDurationLimit, (int)vidOptions.DesiredLength.TotalSeconds);
-					pickerIntent.PutExtra (MediaStore.ExtraVideoQuality, (int)vidOptions.Quality);
-				}
-			}
-
-			return pickerIntent;
-		}
-
-		/// <summary>
-		/// Gets the request identifier.
-		/// </summary>
-		/// <returns>Request id as integer.</returns>
-		private int GetRequestId ()
-		{
-			var id = _requestId;
-			if (_requestId == int.MaxValue) {
-				_requestId = 0;
-			} else {
-				_requestId++;
-			}
-
-			return id;
-		}
-
-		/// <summary>
-		/// Takes the media asynchronous.
-		/// </summary>
-		/// <param name="type">The type of intent.</param>
-		/// <param name="action">The action.</param>
-		/// <param name="options">The options.</param>
-		/// <returns>Task with a return type of MediaFile.</returns>
-		/// <exception cref="System.InvalidOperationException">Only one operation can be active at a time.</exception>
-		private Task<MediaFile> TakeMediaAsync (string type, string action, MediaStorageOptions options)
-		{
-			var id = GetRequestId ();
-
-			var ntcs = new TaskCompletionSource<MediaFile> (id);
-			if (Interlocked.CompareExchange (ref _completionSource, ntcs, null) != null) {
-				throw new InvalidOperationException ("Only one operation can be active at a time");
-			}
-
-			Context.StartActivity (CreateMediaIntent (id, type, action, options));
-
-			EventHandler<MediaPickedEventArgs> handler = null;
-			handler = (s, e) => {
-				var tcs = Interlocked.Exchange (ref _completionSource, null);
-
-				MediaPickerActivity.MediaPicked -= handler;
-
-				if (e.RequestId != id) {
-					return;
-				}
-
-				if (e.Error != null) {
-					tcs.SetException (e.Error);
-				} else if (e.IsCanceled) {
-					tcs.SetCanceled ();
-				} else {
-					tcs.SetResult (e.Media);
-				}
-			};
-
-			MediaPickerActivity.MediaPicked += handler;
-
-			return ntcs.Task;
-		}
-	}
+            return ntcs.Task;
+        }
+    }
 }
