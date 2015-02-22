@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
    <metadata minClientVersion="2.8.1">
        <id>detroitpro.Forms.Plugin.MediaPicker</id>
-       <version>0.0.8</version>
+       <version>0.0.9</version>
        <title>MediaPicker Plugin for Xamarin.Forms</title>
        <authors>Eric Polerecky</authors>
        <owners>Eric Polerecky</owners>
